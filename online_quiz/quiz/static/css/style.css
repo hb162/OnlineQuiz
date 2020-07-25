@@ -1,0 +1,19 @@
+.modal-login__button {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.button--tertiary-outlined {
+    background-color: transparent;
+    border-color: #06b7d8;
+    color: #06b7d8;
+}
+
+.button--tertiary-outlined:after {
+    background: transparent;
+    border-color: #06b7d8;
+    border-left: 3px;
+    border-bottom: 3px;
+    border-right-width: 3px;
+    border-top-width: 3px;
+}

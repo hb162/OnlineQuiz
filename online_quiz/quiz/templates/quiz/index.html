@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}
+        Online Quiz
+    {% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01"
+            aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <a class="navbar-brand" href="{% url 'index' %}">
+            <img src="{% static 'image/logo.png' %}" width="70" height="30" class="d-inline-block align-top" alt=""
+                 loading="lazy">
+            Quiz
+        </a>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+            </li>
+        </ul>
+        <div class="form-inline my-2 my-lg-0">
+            {% if not user.is_authenticated %}
+                <button class="btn btn btn-outline-info my-2 my-sm-0" data-toggle="modal" data-target="#singinmodal">
+                    Sign in
+                </button>
+            {% else %}
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Hi {{ user.username }}
+                            </a>
+                            <!-- Here's the magic. Add the .animate and .slide-in classes to your .dropdown-menu and you're all set! -->
+                            <div class="dropdown-menu dropdown-menu-right animate slideIn"
+                                 aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Thông tin cá nhân</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Đổi mật khẩu</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'teacher_logout' %}">Đăng xuất</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="modal fade" id="singinmodal" tabindex="-1" role="dialog" aria-labelledby="singinmodal"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <a href="{% url 'student_sign_in' %}"
+                                   class="btn btn-outline-primary btn-lg col-md-12 ml-auto">Student
+                                    Login</a>
+                            </div>
+                            <div class="form-group">
+                                <a href="{% url 'teacher_sign_in' %}"
+                                   class="btn btn-outline-warning btn-lg col-md-12 ml-auto">Teacher
+                                    Login</a>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <p>Don't have an account</p>
+                        <a href="{% url 'teacher_signup' %}" target="_blank">Sign Up now!</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+</nav>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+{% block content %}
+
+{% endblock %}
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+</body>
+</html>
