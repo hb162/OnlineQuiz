@@ -1,10 +1,10 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
 from django.core.validators import RegexValidator
 from django.contrib.auth.hashers import check_password, make_password
-
-
+from django.contrib import messages
 from .models import Teacher
+from django.contrib.auth import get_user_model
 
 
 class RegistrationForm(UserCreationForm):
@@ -37,7 +37,6 @@ class RegistrationForm(UserCreationForm):
         email = self.cleaned_data.get('email')
         qs = Teacher.objects.filter(email=email)
         if qs.exists():
-            # err =
             raise forms.ValidationError("email already exists", code='email_error')
         return email
 
@@ -72,7 +71,7 @@ class AuthenticationForm(forms.Form):
         fields = ['email', 'password']
 
 
-class RequestForgetPassword(forms.Form):
+class RequestForgetPassword(PasswordResetForm):
     email = forms.EmailField(widget=forms.TextInput(
         attrs={'class': 'form-control fadeIn third zero-raduis', 'type': 'text', 'name': 'email',
                'placeholder': 'Email'}),
@@ -88,10 +87,21 @@ class RequestForgetPassword(forms.Form):
         fields = ['email']
 
 
-class ResetNewPassword(forms.Form):
+class ResetNewPassword(UserCreationForm):
     password1 = forms.CharField(widget=forms.PasswordInput(
         attrs={'class': 'form-control', 'type': 'password', 'name': 'password1'}),
         label="Password")
     password2 = forms.CharField(widget=forms.PasswordInput(
         attrs={'class': 'form-control', 'type': 'password', 'name': 'password2'}),
         label="Confirm password")
+
+    def check_pass(self):
+        password1 = self.cleaned_data['password1']
+        password2 = self.cleaned_data['password2']
+        if password1 != password2:
+            raise forms.ValidationError("Password don't match!")
+
+    class Meta:
+        model = get_user_model()
+        fields = ['password1', 'password2']
+

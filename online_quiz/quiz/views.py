@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.utils import timezone
 from django.contrib import messages
 from django.http import HttpResponse
@@ -150,15 +150,39 @@ class SetNewPassordView(View):
             'uidb64': uidb64,
             'token': token
         }
+        try:
+            id = force_text(urlsafe_base64_decode(uidb64))
+            user = Teacher.objects.get(id=id)
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                messages.info(request, "Password reset link is invalid, please request again")
+                return render(request, 'quiz/request_reset_password_email.html')
+        except DjangoUnicodeDecodeError:
+            messages.info(request, "Invalid link")
+            return render(request, 'quiz/request_reset_password_email.html')
         return render(request, 'quiz/set_new_password.html', context)
 
     def post(self, request, uidb64, token):
-        context = {
-            'uidb64': uidb64,
-            'token': token
-        }
-        form = ResetNewPassword(data=request.POST)
-
+        reset_form = ResetNewPassword(data=request.POST)
+        if reset_form.is_valid():
+            try:
+                Teacher = get_user_model()
+                id = force_text(urlsafe_base64_decode(uidb64))
+                user = Teacher.objects.get(id=id)
+                paswd = reset_form.cleaned_data['password1']
+                hashed = make_password(paswd)
+                user.password = hashed
+                user.save()
+                return redirect('teacher_sign_in')
+            except DjangoUnicodeDecodeError:
+                messages.add_message(request, messages.ERROR, 'Something went wrong. Please try again.')
+                return render(request, 'quiz/set_new_password.html', {'reset_form': reset_form})
+        else:
+            context = {
+                'uidb64': uidb64,
+                'token': token,
+                'has_error': False,
+                'reset_form': reset_form
+            }
         return render(request, 'quiz/set_new_password.html', context)
 
 
