@@ -6,7 +6,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.shortcuts import render, redirect
 from django.views import View
 from .utils import PasswordResetTokenGenerator
-from .models import Teacher
+from .models import *
 from django.contrib.auth.hashers import check_password, make_password
 from .forms import AuthenticationForm, UserCreationForm, RegistrationForm, RequestForgetPassword, ResetNewPassword
 from django.contrib.sites.shortcuts import get_current_site
@@ -184,6 +184,25 @@ class SetNewPassordView(View):
                 'reset_form': reset_form
             }
         return render(request, 'quiz/set_new_password.html', context)
+
+
+def quizz_tab(request):
+    if request.method=="GET":
+        quiz = Quiz.objects.all()
+        context = {'quiz': quiz}
+    return render(request, 'quiz/quizzes_tab.html', context)
+
+
+def add_quiz(request):
+    return render(request, 'quiz/add_quiz.html')
+
+
+def quiz_detail(request, id):
+    return render(request, 'quiz/quiz_detail.html')
+
+
+def rooms_tab(request):
+    return render(request, 'quiz/rooms_tab.html')
 
 
 def student_sign_in(request):

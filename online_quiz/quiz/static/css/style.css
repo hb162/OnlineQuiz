@@ -17,3 +17,8 @@
     border-right-width: 3px;
     border-top-width: 3px;
 }
+
+.my-btn{
+    border: 1px solid;
+    border-radius: 30px;
+}

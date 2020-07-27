@@ -1,0 +1,10 @@
+{% extends 'quiz/index.html' %}
+{% load static %}
+{% block title %}Room{% endblock %}
+{% block content %}
+    {% if user.is_authenticated %}
+        <h1>Lorem ipsum</h1>
+    {% else %}
+        <h1>Please Login first.</h1>
+    {% endif %}
+{% endblock %}
