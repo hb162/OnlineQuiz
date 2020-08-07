@@ -34,8 +34,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django_countries',
-    'django_mysql',
     'quiz',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -151,6 +149,6 @@ EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 
-MESSAGE_TAGS={
-    messages.ERROR:'danger'
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger'
 }

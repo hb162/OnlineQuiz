@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.utils import timezone
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.shortcuts import render, redirect
 from django.views import View
@@ -16,6 +16,8 @@ from .utils import generate_token
 from django.core.mail import EmailMessage
 from django.conf import settings
 import threading
+
+User = get_user_model()
 
 
 class EmailThreading(threading.Thread):
@@ -42,12 +44,12 @@ def teacher_signup(request):
             current_site = get_current_site(request)
             email_subject = 'Activate your Account'
             message = render_to_string('quiz/activate.html',
-            {
-                'user': usr,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(usr.pk)),
-                'token': generate_token.make_token(usr)
-            })
+                                       {
+                                           'user': usr,
+                                           'domain': current_site.domain,
+                                           'uid': urlsafe_base64_encode(force_bytes(usr.pk)),
+                                           'token': generate_token.make_token(usr)
+                                       })
             email_message = EmailMessage(
                 email_subject,
                 message,
@@ -89,8 +91,8 @@ def teacher_sign_in(request):
     if request.method == "POST":
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
-            email = request.POST['email']
-            password = request.POST['password']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
             user = authenticate(email=email, password=password)
             if user:
                 if user.active:
@@ -187,10 +189,19 @@ class SetNewPassordView(View):
 
 
 def quizz_tab(request):
-    if request.method=="GET":
-        quiz = Quiz.objects.all()
-        context = {'quiz': quiz}
-    return render(request, 'quiz/quizzes_tab.html', context)
+    ctx = {}
+    try:
+        quiz = Quiz.objects.filter(teacher_id=request.user.id)
+        ctx["quiz"] = quiz
+        if request.is_ajax():
+            html = render_to_string(
+                template_name="quiz/quiz_search_result.html", context={"quiz": quiz}
+            )
+            data_dict = {"html_from_view": html}
+            return JsonResponse(data=data_dict, safe=False)
+    except(ValueError, AttributeError):
+        return HttpResponse("sai")
+    return render(request, "quiz/quiz_tab.html", context=ctx)
 
 
 def add_quiz(request):

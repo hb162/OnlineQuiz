@@ -1,10 +1,134 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'quiz/index.html' %}
+{% load static %}
+{% block title %}Quizzes{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/quizz.css' %}">
+{% endblock %}
+{% block content %}
+    {% if user.is_authenticated %}
+        <br>
+        <div class="row">
+            <div class="col-sm d-inline-flex p-2">
+                <div class="p-2 position-relative">
+                    <label><i class="fas fa-pen" style="font-size: 25px"></i>
+                        <input type="text" name="title" class="quiz_title" placeholder="Title">
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm p-2">
+                <div class="p-2 float-right"><a href="#" class="btn btn-primary" style="border-radius: 20px;
+    font-size:26px">Save and exit</a></div>
+            </div>
+        </div>
+        <br><br>
 
-</body>
-</html>
+        {#form question#}
+        <div>
+            <div class="text-center"><h2>Add a question</h2></div>
+            <div class="text-center">
+                <button type="button" id="add_question" class="btn-add-question" style="font-size:20px">Add Question
+                </button>
+            </div>
+            <br>
+
+            {# question title #}
+            <div class="form_question" id="add_question_form">
+                <form method="post" class="">
+                    <div class="row">
+                        <div class="col-sm-1">
+                            <input type="text" class="question_title_label" value="1" readonly>
+                        </div>
+                        <div class="col-sm-7">
+                            <input type="text" id="question_title" name="question_title"
+                                   placeholder="Have a multiple-choice question to ask?"
+                                   class="question_title form-control">
+                        </div>
+                    </div>
+                    <br>
+
+                    {# question selector  #}
+                    <div class="question_wrapper">
+                        <div class="row">
+                            <div class="col-sm-1"></div>
+                            <div class="col-sm-7">
+                                <input type="text" name="question[]" value=""/>
+                                <a href="#" class="add_selector" title="Add field">
+                                    <i class="fa fa-plus" aria-hidden="true"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                let maxQuestion = 50;
+                let addButton = $('#add_question');
+                let wrapper = $('.form_question');
+                let fieldHTML = '<div class="row">\n' +
+                    '                        <div class="col-sm-1">\n' +
+                    '                            <input type="text" class="question_title_label" value="1" readonly>\n' +
+                    '                        </div>\n' +
+                    '                        <div class="col-sm-7">\n' +
+                    '                            <input type="text" class="question_title" name="question_title"\n' +
+                    '                                   placeholder="Have a multiple-choice question to ask?"\n' +
+                    '                                   class="question_title form-control">\n' +
+                    '                        </div>\n' +
+                    '                    </div>\n' +
+                    '                    <br>\n' +
+                    '\n' +
+                    '                    {# question selector #}\n' +
+                    '                    <div class="question_wrapper">\n' +
+                    '                        <div>\n' +
+                    '                            <input type="text" name="question[]" value=""/>\n' +
+                    '                            <a href="#" class="add_selector" title="Add field">\n' +
+                    '                                <i class="fa fa-plus" aria-hidden="true"></i></a>\n' +
+                    '                        </div>\n' +
+                    '                    </div>'
+                let x = 1;
+                $(addButton).click(function () {
+                    //Check maximum number of input fields
+                    if (x < maxQuestion) {
+                        x++; //Increment field counter
+                        $(wrapper).append(fieldHTML); //Add field html
+                    }
+                });
+
+                //Once remove button is clicked
+                {#$(wrapper).on('click', '.remove_button', function (e) {#}
+                {#    e.preventDefault();#}
+                {#    $(this).parent('div').remove(); //Remove field html#}
+                {#    x--; //Decrement field counter#}
+                //{#});#}
+            });
+        </script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                let maxField = 10; //Input fields increment limitation
+                let addButton = $('.add_selector'); //Add button selector
+                let wrapper = $('.question_wrapper'); //Input field wrapper
+                let fieldHTML = '<' +
+                    'div><input type="text" name="question[]" value=""/><a href="#" class="remove_button">' +
+                    '<i class="fas fa-minus"></i></a></div>'; //New input field html
+                let x = 1; //Initial field counter is 1
+
+                //Once add button is clicked
+                $(addButton).click(function () {
+                    //Check maximum number of input fields
+                    if (x < maxField) {
+                        x++; //Increment field counter
+                        $(wrapper).append(fieldHTML); //Add field html
+                    }
+                });
+
+                //Once remove button is clicked
+                $(wrapper).on('click', '.remove_button', function (e) {
+                    e.preventDefault();
+                    $(this).parent('div').remove(); //Remove field html
+                    x--; //Decrement field counter
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% if quiz %}
+    {% for q in quiz %}
+        <tr>
+            <td>
+                <div class=" quiz_id">
+                    <a href="{% url 'quiz_detail' q.id %}">{{ q.title }}</a>
+                </div>
+
+            </td>
+            <td>
+                <div class=" quiz_id">
+                    <p>{{ q.created_date }}</p>
+                </div>
+            </td>
+            <td>
+                <input type="checkbox" name='check'>
+            </td>
+        </tr>
+
+    {% endfor %}
+{% else %}
+    <p>Not found</p>
+{% endif %}

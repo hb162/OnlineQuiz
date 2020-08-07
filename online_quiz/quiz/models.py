@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
+import datetime
 
 
 class UserManager(BaseUserManager):
@@ -74,6 +75,7 @@ class Quiz(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name="quiz")
     title = models.CharField(max_length=255)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    created_date = models.DateField(default=datetime.date.today)
 
     def __str__(self):
         return self.title
@@ -81,6 +83,7 @@ class Quiz(models.Model):
 
 class QuizCopy1(models.Model):
     title = models.CharField(max_length=255)
+    student_choices = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -88,6 +91,7 @@ class QuizCopy1(models.Model):
 
 class QuizCopy2(models.Model):
     title = models.CharField(max_length=255)
+    student_choices = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.title

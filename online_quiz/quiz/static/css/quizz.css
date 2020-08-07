@@ -1,6 +1,101 @@
-.my-btn{
-    border: 1px solid;
-    border-radius: 30px;
-    background-color: #d8f8ff;
-    color:#fff;
+#search_input{
+  height:45px;
+  width: 250px;
+  border:1px solid #8cb4d2 ;
+}
+
+#search_input:active,
+#search_input:focus
+{
+     border:1px solid #8cb4d2; /* here configure as your needs */
+     color:#8cb4d2;
+}
+
+.search-quizz{
+  height:65px;
+  width: 1100px;
+  background-color: #f0f0f0;
+}
+.search-div{
+  padding-top:10px;
+  padding-left: 12px;
+}
+
+.all-checkbox{
+    margin-left:100px;
+}
+
+.z{
+    height:20px;
+    width: 20px;
+}
+
+.quiz_id{
+    font-size: 100% ;
+}
+
+.quiz_title{
+    height: 50px;
+    width: 300px;
+    border-radius:5px;
+    border: 1px solid #378de5;
+    font-size: 20px;
+}
+
+.btn-add-question {
+	box-shadow:inset -1px 0px 0px 0px #bbdaf7;
+	background:linear-gradient(to bottom, #79bbff 5%, #378de5 100%);
+	background-color:#79bbff;
+	border-radius:11px;
+	border:1px solid #84bbf3;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:16px;
+	font-weight:bold;
+	padding:10px 34px;
+	text-decoration:none;
+	text-shadow:-1px 1px 0px #528ecc;
+}
+.btn-add-question:hover {
+	background:linear-gradient(to bottom, #378de5 5%, #79bbff 100%);
+	background-color:#378de5;
+}
+.btn-add-question:active {
+	position:relative;
+	top:1px;
+}
+
+#add_question_form{
+    background-color: #f5f7f8;
+}
+
+.question_title{
+    border: 0 solid #fff;
+    border-radius: 10px;
+    margin-left: 0px;
+    margin-top:20px;
+    width: 600px;
+    height: 35px;
+    font-weight: bold;
+}
+
+.question_title_label{
+    margin-top: 20px;
+    margin-left: 40px;
+    width: 20px;
+    height: 35px;
+    border: 0 solid #fff;
+    background-color: #f5f7f8;
+}
+
+.add_selector{
+    border: 0 solid #fff;
+    border-radius: 10px;
+    margin-left: 0px;
+    margin-top:20px;
+    width: 600px;
+    height: 35px;
+    font-weight: bold;
 }

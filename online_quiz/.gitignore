@@ -136,3 +136,4 @@ dmypy.json
 .idea/modules.xml
 .idea/online_quiz.iml
 .idea/vcs.xml
+quiz/email_info.py
