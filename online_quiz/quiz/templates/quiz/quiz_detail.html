@@ -36,26 +36,25 @@
                 <form method="post" class="">
                     <div class="row">
                         <div class="col-sm-1">
-                            <input type="text" class="question_title_label" value="1" readonly>
+                            <label for="question_title" class="incr">1</label>
                         </div>
-                        <div class="col-sm-7">
+                        <div class="col-sm-8">
                             <input type="text" id="question_title" name="question_title"
                                    placeholder="Have a multiple-choice question to ask?"
-                                   class="question_title form-control">
-                        </div>
-                    </div>
+                                   class="question_title form-control"><a href="javascript:void(0);" class="remove_question">
+                            <i class="fa fa-trash" aria-hidden="true"></i></a>
                     <br>
-
-                    {# question selector  #}
                     <div class="question_wrapper">
                         <div class="row">
                             <div class="col-sm-1"></div>
                             <div class="col-sm-7">
-                                <input type="text" name="question[]" value=""/>
-                                <a href="#" class="add_selector" title="Add field">
+                                <input type="text" name="question" value=""/>
+                                <a href="javascript:void(0);" class="add_selector" title="Add field">
                                     <i class="fa fa-plus" aria-hidden="true"></i></a>
                             </div>
                         </div>
+                    </div>
+                    </div>
                     </div>
                 </form>
             </div>
@@ -66,67 +65,66 @@
                 let maxQuestion = 50;
                 let addButton = $('#add_question');
                 let wrapper = $('.form_question');
-                let fieldHTML = '<div class="row">\n' +
-                    '                        <div class="col-sm-1">\n' +
-                    '                            <input type="text" class="question_title_label" value="1" readonly>\n' +
-                    '                        </div>\n' +
-                    '                        <div class="col-sm-7">\n' +
-                    '                            <input type="text" class="question_title" name="question_title"\n' +
-                    '                                   placeholder="Have a multiple-choice question to ask?"\n' +
-                    '                                   class="question_title form-control">\n' +
-                    '                        </div>\n' +
-                    '                    </div>\n' +
-                    '                    <br>\n' +
-                    '\n' +
-                    '                    {# question selector #}\n' +
-                    '                    <div class="question_wrapper">\n' +
-                    '                        <div>\n' +
-                    '                            <input type="text" name="question[]" value=""/>\n' +
-                    '                            <a href="#" class="add_selector" title="Add field">\n' +
-                    '                                <i class="fa fa-plus" aria-hidden="true"></i></a>\n' +
-                    '                        </div>\n' +
-                    '                    </div>'
+
                 let x = 1;
                 $(addButton).click(function () {
                     //Check maximum number of input fields
                     if (x < maxQuestion) {
-                        x++; //Increment field counter
-                        $(wrapper).append(fieldHTML); //Add field html
+                        let fieldHTML = '<div class="row">\n' +
+                            '                 <div class="col-sm-1">\n' +
+                            '                      <label for="question_title">'+x+'.'+'</label>\n' +
+                            '                 </div>\n' +
+                            '                 <div class="col-sm-7">\n' +
+                            '                      <input type="text" id="question_title" name="question_title"\n' +
+                            '                            placeholder="Have a multiple-choice question to ask?"\n' +
+                            '                            class="question_title form-control"><a href="javascript:void(0);" class="remove_question"><i class="fas fa-minus"></i></a>\n' +
+                            '                  <br>\n' +
+                            '                       <div class="question_wrapper">\n' +
+                            '                           <div class="row">\n' +
+                            '                            <div class="col-sm-1"></div>\n' +
+                            '                            <div class="col-sm-7">\n' +
+                            '                                <input type="text" name="question" value=""/>\n' +
+                            '                                <a href="javascript:void(0);" class="add_selector" title="Add field">\n' +
+                            '                                    <i class="fa fa-plus" aria-hidden="true"></i></a>\n' +
+                            '                            </div>\n' +
+                            '                        </div>\n' +
+                            '                    </div>\n' +
+                            '                    </div>\n' +
+                            '                    </div>\n' +
+                            '                </form>';
+                        $(wrapper).append(fieldHTML);
+                        x++;
                     }
                 });
 
-                //Once remove button is clicked
-                {#$(wrapper).on('click', '.remove_button', function (e) {#}
-                {#    e.preventDefault();#}
-                {#    $(this).parent('div').remove(); //Remove field html#}
-                {#    x--; //Decrement field counter#}
-                //{#});#}
+                $(document).on('click', '.remove_question', function (e) {
+                    e.preventDefault();
+                    $(this).parent('div').remove(); //Remove field html
+                    x--; //Decrement field counter
+                });
             });
         </script>
         <script type="text/javascript">
             $(document).ready(function () {
-                let maxField = 10; //Input fields increment limitation
-                let addButton = $('.add_selector'); //Add button selector
-                let wrapper = $('.question_wrapper'); //Input field wrapper
+                let maxField = 10;
+                let addButton = $('.add_selector');
+                let wrapper = $('.question_wrapper');
                 let fieldHTML = '<' +
-                    'div><input type="text" name="question[]" value=""/><a href="#" class="remove_button">' +
-                    '<i class="fas fa-minus"></i></a></div>'; //New input field html
-                let x = 1; //Initial field counter is 1
+                    'div id="test"><input type="text" name="question" value=""/><a href="javascript:void(0);" class="remove_button">' +
+                    '<i class="fas fa-minus"></i></a></div>';
 
-                //Once add button is clicked
-                $(addButton).click(function () {
-                    //Check maximum number of input fields
+                $(document).on('click', '.add_selector', function () {
+                    let x = $(this).parent('div').children('div[id="test"]').length;
                     if (x < maxField) {
-                        x++; //Increment field counter
-                        $(wrapper).append(fieldHTML); //Add field html
+                        $(this).parent('div').append(fieldHTML);
                     }
                 });
 
-                //Once remove button is clicked
-                $(wrapper).on('click', '.remove_button', function (e) {
+                $(document).on('click', '.remove_button', function (e) {
+                    let x = 1
                     e.preventDefault();
-                    $(this).parent('div').remove(); //Remove field html
-                    x--; //Decrement field counter
+                    $(this).parent('div').remove();
+                    x--;
                 });
             });
         </script>
