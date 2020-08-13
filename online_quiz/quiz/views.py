@@ -1,10 +1,10 @@
 from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.utils import timezone
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.shortcuts import render, redirect
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from .utils import PasswordResetTokenGenerator
 from .models import *
 from django.contrib.auth.hashers import check_password, make_password
@@ -16,6 +16,7 @@ from .utils import generate_token
 from django.core.mail import EmailMessage
 from django.conf import settings
 import threading
+import json
 
 User = get_user_model()
 
@@ -204,12 +205,53 @@ def quizz_tab(request):
     return render(request, "quiz/quiz_tab.html", context=ctx)
 
 
-def add_quiz(request):
-    return render(request, 'quiz/add_quiz.html')
-
-
 def quiz_detail(request, id):
-    return render(request, 'quiz/quiz_detail.html')
+    context = {}
+    quiz = Quiz.objects.filter(teacher_id=request.user.id).get(id=id)
+    questions = Questions.objects.filter(quiz_id=quiz.id)
+    context = {'quiz': quiz, 'questions': questions}
+    if request.is_ajax():
+        print("IS ajax")
+    else:
+        print("not")
+    return render(request, 'quiz/quiz_detail.html', context)
+
+
+@csrf_exempt
+def add_quiz(request):
+    if request.method == "POST":
+        data = request.POST['data']
+        dict_data = json.loads(data)
+        try:
+            quiz_title = ''
+            question_title = ''
+            selector = []
+            for i in dict_data:
+                if 'quiz-title' in i:
+                    quiz_title = i['quiz-title']
+                    print(quiz_title)
+                else:
+                    question_title = i['question_title']
+                    selector = i['selector']
+                    print(question_title)
+                    print(selector)
+            Quiz.objects.create(
+                title=quiz_title,
+                subject_id=1,
+                teacher_id=request.user.id
+            )
+            q_id = Quiz.objects.get(title=quiz_title).id
+            Questions.objects.create(
+                title=question_title,
+                choices=selector,
+                quiz_id=q_id
+            )
+            return render(request, "quiz/quiz_tab.html")
+        except (ValueError, AttributeError):
+            return HttpResponse("error")
+    else:
+        print("abc")
+    return render(request, 'quiz/add_quiz.html')
 
 
 def rooms_tab(request):

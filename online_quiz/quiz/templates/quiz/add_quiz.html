@@ -1,6 +1,154 @@
 {% extends 'quiz/index.html' %}
 {% load static %}
-{% block title %}Room{% endblock %}
+{% block title %}Quizzes{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/quizz.css' %}">
+{% endblock %}
 {% block content %}
+    {% if user.is_authenticated %}
+        <br>
+        <div>
+            <form method="post" id="quiz">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-lg d-inline-flex p-2">
+                        <div class="p-2 position-relative">
+                            <label><i class="fas fa-pen" style="font-size: 25px"></i>
+                                <input type="text" name="quiz-title" id="quiz-title" class="quiz_title" placeholder="Title">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg p-2">
+                        <div class="p-2 float-right">
+                            <button type="submit" id="saveandexit" class="btn btn-primary" style="border-radius: 20px; font-size:26px">
+                                Save and exit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <br><br>
 
+                {#form question#}
+                <div>
+                    <div class="text-center"><h2>Add a question</h2></div>
+                    <div class="text-center">
+                        <button type="button" id="add_question" class="btn-add-question" style="font-size:20px">Add
+                            Question
+                        </button>
+                    </div>
+                    <br>
+
+                    {# question title #}
+                    <div class="form_question" id="add_question_form">
+
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                let maxQuestion = 50;
+                let addButton = $('#add_question');
+                let wrapper = $('.form_question');
+
+                let x = 1;
+                $(addButton).click(function () {
+                    //Check maximum number of input fields
+                    if (x < maxQuestion) {
+                        let fieldHTML = '<div class="row">\n' +
+                            '                 <div class="col-lg-1">\n' +
+                            '                      <label for="question_title" class="incr">' + x + '.' + '</label>\n' +
+                            '                 </div>\n' +
+                            '                 <div class="col-lg-9 qs">\n' +
+                            '                      <input type="text" id="question_title" name="question_title"\n' +
+                            '                            placeholder="Have a multiple-choice question to ask?"\n' +
+                            '                            class="question_title form-control inline ">' +
+                            '<a href="javascript:void(0);" class="remove_question"><i class="fa fa-trash inline faw" aria-hidden="true"></i></a>\n' +
+                            '                  <br>\n' +
+                            '                       <div class="question_wrapper">\n' +
+                            '                           <div class="row">\n' +
+                            '                            <div class="col-lg-1"></div>\n' +
+                            '                            <div class="col-lg-9" id="test1">\n' +
+                            '                                <div class="test"><input type="text" name="question" placeholder="Answer.." class="question_selector inline sel_data">\n' +
+                            '                                <a href="javascript:void(0);" class="add_selector" title="Add field">\n' +
+                            '                                    <i class="fa fa-plus inline faw" aria-hidden="true"></i></a></div>\n' +
+                            '                            </div>\n' +
+                            '                        </div>\n' +
+                            '                    </div>\n' +
+                            '                    </div>\n' +
+                            '                    </div>';
+                        $(wrapper).append(fieldHTML);
+                        x++;
+                    }
+                });
+
+                $(document).on('click', '.remove_question', function (e) {
+                    e.preventDefault();
+                    $(this).parent('div').parent('div').remove(); //Remove field html
+                    x--; //Decrement field counter
+                });
+            });
+        </script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                let maxField = 10;
+                let fieldHTML = '<' +
+                    'div class="test"><input type="text" name="question" placeholder="Answer..." class="question_selector inline sel_data"><a href="javascript:void(0);" class="remove_button">' +
+                    '<i class="fas fa-minus inline faw"></i></a></div>';
+
+                $(document).on('click', '.add_selector', function () {
+                    let x = $(this).parent('div').children('div[id="test"]').length;
+                    if (x < maxField) {
+                        $(this).parent('div').parent('div').append(fieldHTML);
+                    }
+                });
+
+                $(document).on('click', '.remove_button', function (e) {
+                    let x = 1
+                    e.preventDefault();
+                    $(this).parent('div').remove();
+                    x--;
+                });
+
+                //ajax send data
+                $("#saveandexit").click(function (event) {
+                    event.preventDefault();
+                    let json_data = [];
+                    let question_title = "";
+                    let selector = "";
+                    let selector_data = []
+                    let quiz_title = ""
+                    $(".qs").each(function () {
+                        let s = []
+                        question_title = $(this).children('input[id="question_title"]').val();
+                        $(this).children('div[class="question_wrapper"]').children('div[class="row"]').children('div[id="test1"]').children('div[class="test"]').children('input').each(function () {
+                            selector_data.push($(this).val());
+                        })
+                        let questions_data = {"question_title":question_title, "selector":selector_data};
+                        json_data.push(questions_data);
+                        selector_data = []
+                    })
+                    quiz_title = {"quiz-title": $("#quiz-title").val()}
+                    json_data.push(quiz_title)
+                    let string_data = JSON.stringify(json_data)
+                    $.ajax({
+                        type: "POST",
+                        url: '{% url 'add_quiz' %}',
+                        data: {
+                            data: string_data
+                        },
+                        success: function () {
+                            alert("yes")
+                        },
+                        error: function (){
+                            alert("dmcs")
+                        }
+                    });
+                    return false;
+                });
+            });
+        </script>
+    {% endif %}
 {% endblock %}

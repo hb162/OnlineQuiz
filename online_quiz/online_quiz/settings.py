@@ -82,7 +82,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'quiz_online',
         'USER': 'root',
-        'PASSWORD': 'test',
+        'PASSWORD': '1',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {

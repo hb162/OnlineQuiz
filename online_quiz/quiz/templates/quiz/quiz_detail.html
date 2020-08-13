@@ -11,7 +11,7 @@
             <div class="col-sm d-inline-flex p-2">
                 <div class="p-2 position-relative">
                     <label><i class="fas fa-pen" style="font-size: 25px"></i>
-                        <input type="text" name="title" class="quiz_title" placeholder="Title">
+                        <input type="text" name="title" class="quiz_title" placeholder="Title" value="{{ quiz.title }}">
                     </label>
                 </div>
             </div>
@@ -33,31 +33,45 @@
 
             {# question title #}
             <div class="form_question" id="add_question_form">
-                <form method="post" class="">
+                <form method="post" id="question">
+                    {% for q in questions %}
+                        {{ q.title }}
+                    {% endfor %}
                     <div class="row">
-                        <div class="col-sm-1">
-                            <label for="question_title" class="incr">1</label>
+                        <div class="col-lg-1">
+                            <label for="question_title" class="incr">' + x + '.' + '</label>
                         </div>
-                        <div class="col-sm-8">
+                        <div class="col-lg-9 qs">
                             <input type="text" id="question_title" name="question_title"
                                    placeholder="Have a multiple-choice question to ask?"
-                                   class="question_title form-control"><a href="javascript:void(0);" class="remove_question">
-                            <i class="fa fa-trash" aria-hidden="true"></i></a>
-                    <br>
-                    <div class="question_wrapper">
-                        <div class="row">
-                            <div class="col-sm-1"></div>
-                            <div class="col-sm-7">
-                                <input type="text" name="question" value=""/>
-                                <a href="javascript:void(0);" class="add_selector" title="Add field">
-                                    <i class="fa fa-plus" aria-hidden="true"></i></a>
+                                   class="question_title form-control inline ">
+                            <a href="javascript:void(0);" class="remove_question"><i class="fa fa-trash inline faw"
+                                                                                     aria-hidden="true"></i></a>
+                            <br>
+                            <div class="question_wrapper">
+                                <div class="row">
+                                    <div class="col-lg-1"></div>
+                                    <div class="col-lg-9" id="test1">
+                                        <div class="test"><input type="text" name="question" placeholder="Answer.."
+                                                                 class="question_selector inline sel_data">\n +
+                                            <a href="javascript:void(0);" class="add_selector" title="Add field">
+                                                <i class="fa fa-plus inline faw" aria-hidden="true"></i></a></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="explain">
+                                <div class="row">
+                                    <div class="col-lg-1"></div>
+                                    <div class="col-lg-9">
+                                        <input type="text" id="question_explain" class="question_title" placeholder="An explaination, if you like">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    </div>
-                    </div>
                 </form>
             </div>
+
         </div>
 
         <script>
@@ -71,27 +85,27 @@
                     //Check maximum number of input fields
                     if (x < maxQuestion) {
                         let fieldHTML = '<div class="row">\n' +
-                            '                 <div class="col-sm-1">\n' +
-                            '                      <label for="question_title">'+x+'.'+'</label>\n' +
+                            '                 <div class="col-lg-1">\n' +
+                            '                      <label for="question_title" class="incr">' + x + '.' + '</label>\n' +
                             '                 </div>\n' +
-                            '                 <div class="col-sm-7">\n' +
+                            '                 <div class="col-lg-9 qs">\n' +
                             '                      <input type="text" id="question_title" name="question_title"\n' +
                             '                            placeholder="Have a multiple-choice question to ask?"\n' +
-                            '                            class="question_title form-control"><a href="javascript:void(0);" class="remove_question"><i class="fas fa-minus"></i></a>\n' +
+                            '                            class="question_title form-control inline ">' +
+                            '<a href="javascript:void(0);" class="remove_question"><i class="fa fa-trash inline faw" aria-hidden="true"></i></a>\n' +
                             '                  <br>\n' +
                             '                       <div class="question_wrapper">\n' +
                             '                           <div class="row">\n' +
-                            '                            <div class="col-sm-1"></div>\n' +
-                            '                            <div class="col-sm-7">\n' +
-                            '                                <input type="text" name="question" value=""/>\n' +
+                            '                            <div class="col-lg-1"></div>\n' +
+                            '                            <div class="col-lg-9" id="test1">\n' +
+                            '                                <div class="test"><input type="text" name="question" placeholder="Answer.." class="question_selector inline sel_data">\n' +
                             '                                <a href="javascript:void(0);" class="add_selector" title="Add field">\n' +
-                            '                                    <i class="fa fa-plus" aria-hidden="true"></i></a>\n' +
+                            '                                    <i class="fa fa-plus inline faw" aria-hidden="true"></i></a></div>\n' +
                             '                            </div>\n' +
                             '                        </div>\n' +
                             '                    </div>\n' +
                             '                    </div>\n' +
-                            '                    </div>\n' +
-                            '                </form>';
+                            '                    <hr></div>';
                         $(wrapper).append(fieldHTML);
                         x++;
                     }
@@ -99,7 +113,7 @@
 
                 $(document).on('click', '.remove_question', function (e) {
                     e.preventDefault();
-                    $(this).parent('div').remove(); //Remove field html
+                    $(this).parent('div').parent('div').remove(); //Remove field html
                     x--; //Decrement field counter
                 });
             });
@@ -110,8 +124,8 @@
                 let addButton = $('.add_selector');
                 let wrapper = $('.question_wrapper');
                 let fieldHTML = '<' +
-                    'div id="test"><input type="text" name="question" value=""/><a href="javascript:void(0);" class="remove_button">' +
-                    '<i class="fas fa-minus"></i></a></div>';
+                    'div id="test"><input type="text" name="question" placeholder="Answer..." class="question_selector inline"><a href="javascript:void(0);" class="remove_button">' +
+                    '<i class="fas fa-minus inline faw"></i></a></div>';
 
                 $(document).on('click', '.add_selector', function () {
                     let x = $(this).parent('div').children('div[id="test"]').length;
