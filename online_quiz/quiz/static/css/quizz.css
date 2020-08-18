@@ -42,6 +42,11 @@
     font-size: 20px;
 }
 
+.incr {
+    margin-top: 25px;
+    margin-left: 42px;
+}
+
 .btn-add-question {
     box-shadow: inset -1px 0px 0px 0px #bbdaf7;
     background: linear-gradient(to bottom, #79bbff 5%, #378de5 100%);
@@ -51,7 +56,7 @@
     display: inline-block;
     cursor: pointer;
     color: #ffffff;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     font-size: 16px;
     font-weight: bold;
     padding: 10px 34px;
@@ -69,7 +74,7 @@
     top: 1px;
 }
 
-#add_question_form {
+.form_question {
     background-color: #f5f7f8;
     border-radius: 30px;
 }
@@ -79,7 +84,7 @@
     border-radius: 10px;
     margin-left: 0px;
     margin-top: 20px;
-    width: 600px;
+    width: 596px;
     height: 35px;
     font-weight: bold;
 }
@@ -94,19 +99,16 @@
 }
 
 .add_selector {
-    border: 0 solid #fff;
+    border: 0 solid #f5f7f8;
+    background-color: #fff;
+    color:#378de5;
     border-radius: 10px;
-    margin-left: 0px;
     margin-top: 20px;
-    width: 600px;
+    width: 20%;
     height: 35px;
     font-weight: bold;
 }
 
-.incr {
-    margin-top: 25px;
-    margin-left: 42px;
-}
 
 .question_selector {
     border: 0 solid #fff;
@@ -116,6 +118,43 @@
     width: 533px;
     height: 35px;
     font-weight: bold;
+}
+
+.question_explain{
+    border: 0 solid #fff;
+    border-radius: 10px;
+    margin-top: 17px;
+    margin-bottom: 5px;
+    width: 600px;
+    height: 35px;
+    font-weight: bold;
+}
+
+.qs_correct{
+    margin-right: 35px;
+    height: 20px;
+    width:30px;
+}
+
+.correct-choice{
+    border: 2px #06b7d8 solid;
+}
+
+.end-question{
+    margin-left:40px;
+    border-bottom: 1px solid #000;
+    width:93%;
+    margin-top:5px;
+}
+
+.label_explain{
+    border-radius:50%;
+    border:1px solid #f5f7f8;
+    margin-left:10px;
+    padding:8px 10px 8px 10px;
+    background-color:#f5f7f8;
+    color: blue;
+    font-size: 20px;
 }
 
 .inline {
@@ -132,5 +171,51 @@ footer {
     margin-top: 150px;
     width: 100%;
     background-color: #f3f3f3;
-
 }
+
+.qs_title_save_db{
+    font-weight: bold;
+    font-size: 20px;
+    margin-left:30px;
+}
+
+.qs_save_db{
+    margin-left: 45px;
+}
+
+.ten{
+    margin-bottom: 11px;
+}
+
+.correct_ans{
+    border: 1px solid #8cb4d2;
+    background-color: #8cb4d2;
+}
+
+.s{
+    color: white
+}
+
+.edit_question{
+    border:0;
+    background-color: #39f;
+}
+
+.edit_question:hover{
+    background-color: #1b70c4;
+}
+
+.delete_question{
+    background-color: #f5f7f8;
+    border: 0;
+}
+
+.delete_question:hover {
+    background-color: #1b70c4;
+}
+
+.trash{
+    color:#1b70c4;
+}
+
+

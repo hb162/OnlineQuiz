@@ -7,138 +7,265 @@
 {% block content %}
     {% if user.is_authenticated %}
         <br>
-        <div class="row">
-            <div class="col-sm d-inline-flex p-2">
-                <div class="p-2 position-relative">
-                    <label><i class="fas fa-pen" style="font-size: 25px"></i>
-                        <input type="text" name="title" class="quiz_title" placeholder="Title" value="{{ quiz.title }}">
-                    </label>
-                </div>
-            </div>
-            <div class="col-sm p-2">
-                <div class="p-2 float-right"><a href="#" class="btn btn-primary" style="border-radius: 20px;
-    font-size:26px">Save and exit</a></div>
-            </div>
-        </div>
-        <br><br>
-
-        {#form question#}
         <div>
-            <div class="text-center"><h2>Add a question</h2></div>
-            <div class="text-center">
-                <button type="button" id="add_question" class="btn-add-question" style="font-size:20px">Add Question
-                </button>
-            </div>
-            <br>
-
-            {# question title #}
-            <div class="form_question" id="add_question_form">
-                <form method="post" id="question">
-                    {% for q in questions %}
-                        {{ q.title }}
-                    {% endfor %}
-                    <div class="row">
-                        <div class="col-lg-1">
-                            <label for="question_title" class="incr">' + x + '.' + '</label>
-                        </div>
-                        <div class="col-lg-9 qs">
-                            <input type="text" id="question_title" name="question_title"
-                                   placeholder="Have a multiple-choice question to ask?"
-                                   class="question_title form-control inline ">
-                            <a href="javascript:void(0);" class="remove_question"><i class="fa fa-trash inline faw"
-                                                                                     aria-hidden="true"></i></a>
-                            <br>
-                            <div class="question_wrapper">
-                                <div class="row">
-                                    <div class="col-lg-1"></div>
-                                    <div class="col-lg-9" id="test1">
-                                        <div class="test"><input type="text" name="question" placeholder="Answer.."
-                                                                 class="question_selector inline sel_data">\n +
-                                            <a href="javascript:void(0);" class="add_selector" title="Add field">
-                                                <i class="fa fa-plus inline faw" aria-hidden="true"></i></a></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="explain">
-                                <div class="row">
-                                    <div class="col-lg-1"></div>
-                                    <div class="col-lg-9">
-                                        <input type="text" id="question_explain" class="question_title" placeholder="An explaination, if you like">
-                                    </div>
-                                </div>
-                            </div>
+            <form method="post" id="quiz">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-xl d-inline-flex p-2">
+                        <div class="p-2 position-relative">
+                            <label><i class="fas fa-pen" style="font-size: 25px"></i>
+                                <input type="text" name="quiz-title" id="quiz-title" class="quiz_title"
+                                       placeholder="Title">
+                            </label>
                         </div>
                     </div>
-                </form>
-            </div>
+                    <div class="col-xl p-2">
+                        <div class="p-2 float-right">
+                            <button type="submit" id="saveandexit" class="btn btn-primary"
+                                    style="border-radius: 20px; font-size:26px">
+                                Save and exit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <br><br>
 
+
+                {#form question#}
+                <div class="bound">
+                    <div class="form_question" id="form_question">
+                        {% for i in questions %}
+                            <div class="qtn-form" id="{{ i.id|add:-1 }} ">
+                                {% for number, title in i.title_data.items %}
+                                    <div class="row qs_title_save_db">
+                                        <div class="col-xl-1">{{ number }}</div>
+                                        <div class="col-xl-9 editable">{{ title }}</div>
+                                        <div class="col-xl-2">
+                                            <button type="button" class="edit_question"><i class="fas fa-pencil-alt s"></i></button>
+                                            <button type="button" class="delete_question"><img src="{% static 'image/trash.png' %}" class="trash" style="height: 22px"></button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                <div class="qs_save_db">
+                                    {% for key, value in i.choices_data.items %}
+                                        {% if key in i.correct_choices %}
+                                            <div class="row ten">
+                                                <div class="col-xl-1 correct_ans">{{ key }}</div>
+                                                <div class="col-xl-9 correct_ans editable">{{ value }}</div>
+                                            </div>
+                                        {% else %}
+                                            <div class="row ten">
+                                                <div class="col-xl-1">{{ key }}</div>
+                                                <div class="col-xl-9 editable">{{ value }}</div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="row qs_save_db">
+                                    <div class="col-xl-1"> &#33;</div>
+                                    <div class="col-xl-9 editable">{{ i.explain }}</div>
+                                </div>
+                                <br>
+                            </div>
+
+                        {% endfor %}
+                    </div>
+                    <div class="text-center"><h2>Add a question</h2></div>
+                    <div class="text-center">
+                        <button type="button" id="add_question" class="btn-add-question" style="font-size:20px">Add
+                            Question
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
-
         <script>
-            $(document).ready(function () {
-                let maxQuestion = 50;
-                let addButton = $('#add_question');
-                let wrapper = $('.form_question');
+            const qtnList = document.getElementById("form_question");
+            const addQtnBtn = document.getElementById("add_question");
+            const delQtnBtn = document.querySelector(".remove_question");
 
-                let x = 1;
-                $(addButton).click(function () {
-                    //Check maximum number of input fields
-                    if (x < maxQuestion) {
-                        let fieldHTML = '<div class="row">\n' +
-                            '                 <div class="col-lg-1">\n' +
-                            '                      <label for="question_title" class="incr">' + x + '.' + '</label>\n' +
-                            '                 </div>\n' +
-                            '                 <div class="col-lg-9 qs">\n' +
-                            '                      <input type="text" id="question_title" name="question_title"\n' +
-                            '                            placeholder="Have a multiple-choice question to ask?"\n' +
-                            '                            class="question_title form-control inline ">' +
-                            '<a href="javascript:void(0);" class="remove_question"><i class="fa fa-trash inline faw" aria-hidden="true"></i></a>\n' +
-                            '                  <br>\n' +
-                            '                       <div class="question_wrapper">\n' +
-                            '                           <div class="row">\n' +
-                            '                            <div class="col-lg-1"></div>\n' +
-                            '                            <div class="col-lg-9" id="test1">\n' +
-                            '                                <div class="test"><input type="text" name="question" placeholder="Answer.." class="question_selector inline sel_data">\n' +
-                            '                                <a href="javascript:void(0);" class="add_selector" title="Add field">\n' +
-                            '                                    <i class="fa fa-plus inline faw" aria-hidden="true"></i></a></div>\n' +
-                            '                            </div>\n' +
-                            '                        </div>\n' +
-                            '                    </div>\n' +
-                            '                    </div>\n' +
-                            '                    <hr></div>';
-                        $(wrapper).append(fieldHTML);
-                        x++;
+            addQtnBtn.addEventListener("click", () => {
+
+                let qtnId = 0;
+
+                if (qtnList.lastElementChild !== null) {
+                    qtnId = parseInt(qtnList.lastElementChild.id) + 1;
+                }
+
+                const qtnForm = document.createElement("div");
+                qtnForm.setAttribute("class", "qtn-form");
+                qtnForm.setAttribute("id", `${qtnId}`)
+                const qtnFormContent = `
+                        <div class="row">
+                        <div class="col-xl-1 qs_label">
+                                <label for="question_title" class="incr">${qtnId + 1}</label>
+                            </div>
+                            <div class="col-xl-10 qs">
+                                <input type="text" id="question_title" name="question_title"
+                                       placeholder="Have a multiple-choice question to ask?"
+                                       class="question_title form-control inline">
+                                <a href="javascript:void(0);" class="remove_question"><i class="fa fa-trash inline faw"
+                                                                                         aria-hidden="true"></i></a>
+                                <br>
+                                <div class="question_wrapper" id="all_answer"></div>
+                                <button class="add_selector" type="button">&#43;Add Answer</button>
+                                <div class="explain">
+                                    <input type="text" class="question_explain" id="exp"
+                                           placeholder="An explaination, if you like">
+                                    <label for="exp" class="label_explain">i</label>
+                                </div>
+                            </div>
+                            <div class="end-question"></div>
+                        </div>
+        `;
+                qtnForm.innerHTML = qtnFormContent;
+                qtnList.appendChild(qtnForm);
+
+            })
+            qtnList.addEventListener("click", (event) => {
+                const target = event.target;
+                const targetClass = target.className;
+                if (targetClass === null) return;
+
+                if (targetClass === "remove_question") {
+                    deleteQuestion(target);
+                }
+                if (targetClass === "add_selector") {
+                    addAnswer(target);
+                }
+                if (targetClass === "remove_button") {
+                    deleteAnswer(target);
+                }
+            })
+
+            const deleteQuestion = (target) => {
+                const currentQtn = target.parentNode.parentNode.parentNode;
+                let lastQtn = qtnList.lastChild;
+
+                while (lastQtn !== currentQtn) {
+                    const prevQtn = lastQtn.previousSibling;
+                    lastQtn.setAttribute("id", `${prevQtn.id}`);
+                    lastQtn.querySelector(".incr").textContent = `${parseInt(prevQtn.id) + 1}`;
+                    lastQtn = prevQtn;
+                }
+                qtnList.removeChild(currentQtn);
+            }
+
+            const addAnswer = (target) => {
+                const currentQtn = target.parentNode.parentNode;
+                const ansList = currentQtn.querySelector(".question_wrapper");
+                if (ansList.childElementCount < 26) {
+                    let ansId = "A";
+                    if (ansList.lastChild !== null) {
+                        ansId = nextChar(ansList.lastChild.id); //Khi vượt quá "z", hàm này sẽ trả về "{", "}"...
                     }
-                });
+                    const ansForm = document.createElement("div");
+                    ansForm.setAttribute("class", "test");
+                    ansForm.setAttribute("id", `${ansId}`)
+                    const ansFormContent = `
+            <label for="slt" class="incr2">${ansId}</label><input type="checkbox" class="qs_correct inline"><input type="text" id="slt" name="question" placeholder="Answer..." class="question_selector inline sel_data"><a href="javascript:void(0);" class="remove_button">
+                        <i class="fas fa-minus inline faw"></i></a>
+        `;
+                    ansForm.innerHTML = ansFormContent;
+                    ansList.appendChild(ansForm);
+                }
 
-                $(document).on('click', '.remove_question', function (e) {
-                    e.preventDefault();
-                    $(this).parent('div').parent('div').remove(); //Remove field html
-                    x--; //Decrement field counter
-                });
-            });
+            }
+
+            const deleteAnswer = (target) => {
+                const currentAns = target.parentNode;
+                console.log(currentAns)
+                const ansList = currentAns.parentNode;
+                let lastAns = ansList.lastChild;
+                while (lastAns !== currentAns) {
+                    const prevAns = lastAns.previousSibling;
+                    lastAns.setAttribute("id", `${prevAns.id}`);
+                    lastAns.querySelector(".incr2").textContent = `${prevAns.id}`;
+                    lastAns = prevAns;
+                }
+                ansList.removeChild(currentAns);
+            }
+
+
+            /** ------------------------------------------------------- */
+            const nextChar = (c) => {
+                return String.fromCharCode(c.charCodeAt(0) + 1).toUpperCase();
+            }
         </script>
         <script type="text/javascript">
             $(document).ready(function () {
-                let maxField = 10;
-                let addButton = $('.add_selector');
-                let wrapper = $('.question_wrapper');
-                let fieldHTML = '<' +
-                    'div id="test"><input type="text" name="question" placeholder="Answer..." class="question_selector inline"><a href="javascript:void(0);" class="remove_button">' +
-                    '<i class="fas fa-minus inline faw"></i></a></div>';
 
-                $(document).on('click', '.add_selector', function () {
-                    let x = $(this).parent('div').children('div[id="test"]').length;
-                    if (x < maxField) {
-                        $(this).parent('div').append(fieldHTML);
+                $(document).on('click', '.edit_question', function () {
+                    $(".editable").each(function () {
+                        let value = $(this).text()
+                        console.log(value)
+                    })
+                })
+
+                $(document).on('click', '.qs_correct', function () {
+                    if ($(this).prop("checked") === true) {
+                        $(this).parent('div').children('input[type="text"]').addClass('correct-choice');
+                    } else if ($(this).prop("checked") === false) {
+                        $(this).parent('div').children('input[type="text"]').removeClass('correct-choice');
                     }
-                });
+                })
 
-                $(document).on('click', '.remove_button', function (e) {
-                    let x = 1
-                    e.preventDefault();
-                    $(this).parent('div').remove();
-                    x--;
+                //ajax send data
+                $("#saveandexit").click(function (event) {
+                    event.preventDefault();
+                    let json_data = [];
+                    let question_title = {}
+                    let quiz_json_data = [];
+                    let selector_data = {};
+                    let quiz_title = "";
+                    let correct = {};
+                    let explaination = "";
+                    $(".qs").each(function () {
+                        $(this).each(function () {
+                            question_title[$(this).siblings('div').children('label[class="incr"]').text()] = $(this).children('input').val();
+                            console.log(question_title)
+                        })
+                        explaination = $(this).children('div[class="explain"]').children('input[type="text"]').val()
+                        $(this).children('div[class="question_wrapper"]').children('div[class="test"]').each(function () {
+                            selector_data[$(this).children('label').text()] = $(this).children('input[type="text"]').val();
+                        })
+                        $(this).children('div[class="question_wrapper"]').children('div[class="test"]').children('input.correct-choice[type="text"]').each(function () {
+                            correct[$(this).parent('div').children('label[class="incr2"]').text()] = $(this).val();
+                        })
+                        let questions_data = {
+                            "question_title": question_title,
+                            "selector": selector_data,
+                            "exp": explaination,
+                            "correct": correct
+                        }
+                        json_data.push(questions_data);
+                        selector_data = {}
+                        question_title = {}
+                        correct = {}
+                    })
+                    console.log(json_data)
+                    quiz_title = {"quiz-title": $("#quiz-title").val()}
+                    quiz_json_data.push(quiz_title)
+                    let string_question_data = JSON.stringify(json_data)
+                    let string_quiz_data = JSON.stringify(quiz_json_data)
+                    {#$.ajax({#}
+                    {#    type: "POST",#}
+                    {#    url: '{% url 'add_quiz' %}',#}
+                    {#    data: {#}
+                    {#        question_data: string_question_data,#}
+                    {#        quiz_data: string_quiz_data#}
+                    {##}
+                    {#    },#}
+                    {#    success: function () {#}
+                    {#        window.location = "{% url 'quizzes' %}"#}
+                    {#        alert("yes")#}
+                    {#    },#}
+                    {#    error: function () {#}
+                    {#        alert("dmcs")#}
+                    {#    }#}
+                    //{#});#}
+
+                    return false;
                 });
             });
         </script>

@@ -3,6 +3,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
 import datetime
+import json
 
 
 class UserManager(BaseUserManager):
@@ -114,6 +115,15 @@ class Questions(models.Model):
 
     def __str__(self):
         return self.title
+
+    def choices_data(self):
+        return json.loads(self.choices)
+
+    def title_data(self):
+        return json.loads(self.title)
+
+    def correct_choices_data(self):
+        return json.loads(self.correct_choices)
 
 
 class ResultsTest(models.Model):

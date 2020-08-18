@@ -209,44 +209,39 @@ def quiz_detail(request, id):
     context = {}
     quiz = Quiz.objects.filter(teacher_id=request.user.id).get(id=id)
     questions = Questions.objects.filter(quiz_id=quiz.id)
+
     context = {'quiz': quiz, 'questions': questions}
-    if request.is_ajax():
-        print("IS ajax")
-    else:
-        print("not")
     return render(request, 'quiz/quiz_detail.html', context)
 
 
 @csrf_exempt
 def add_quiz(request):
     if request.method == "POST":
-        data = request.POST['data']
-        dict_data = json.loads(data)
+        question_data = request.POST['question_data']
+        quiz_data = request.POST['quiz_data']
+        dict_data = json.loads(question_data)
+        dict_quiz = json.loads(quiz_data)
         try:
-            quiz_title = ''
-            question_title = ''
-            selector = []
-            for i in dict_data:
-                if 'quiz-title' in i:
-                    quiz_title = i['quiz-title']
-                    print(quiz_title)
-                else:
-                    question_title = i['question_title']
-                    selector = i['selector']
-                    print(question_title)
-                    print(selector)
+            quiz_title = dict_quiz[0]['quiz-title']
             Quiz.objects.create(
                 title=quiz_title,
                 subject_id=1,
                 teacher_id=request.user.id
             )
-            q_id = Quiz.objects.get(title=quiz_title).id
-            Questions.objects.create(
-                title=question_title,
-                choices=selector,
-                quiz_id=q_id
-            )
-            return render(request, "quiz/quiz_tab.html")
+            for i in dict_data:
+                question_title = json.dumps(i['question_title'], ensure_ascii=False)
+                selector = json.dumps(i['selector'], ensure_ascii=False)
+                correct = json.dumps(i['correct'], ensure_ascii=False)
+                explain = i['exp']
+                q_id = Quiz.objects.get(title=quiz_title).id
+                Questions.objects.create(
+                    title=question_title,
+                    choices=selector,
+                    quiz_id=q_id,
+                    correct_choices=correct,
+                    explain=explain
+                )
+
         except (ValueError, AttributeError):
             return HttpResponse("error")
     else:
