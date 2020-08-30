@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'student_quiz',
     'quiz',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -152,3 +153,5 @@ EMAIL_PORT = 587
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'
 }
+
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True

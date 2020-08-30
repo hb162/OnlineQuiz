@@ -1,4 +1,4 @@
-#search_input {
+#search_input, #search_input_2 {
     height: 45px;
     width: 250px;
     border: 1px solid #8cb4d2;
@@ -12,7 +12,7 @@
 
 .search-quizz {
     height: 65px;
-    width: 1100px;
+    width: 100%;
     background-color: #f0f0f0;
 }
 
@@ -218,4 +218,109 @@ footer {
     color:#1b70c4;
 }
 
+.launch_search_quiz{
+    height: 65px;
+    width: 100%;
+    background-color: #f0f0f0;
+}
+
+.step-circle{
+    border-radius: 50%;
+    display: inline-block;
+    height: 45px;
+    text-align: center;
+    width: 45px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    background-color: #8cb4d2;
+}
+
+.step-circle-text{
+    cursor: default;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 41px;
+    color: #fff;
+}
+
+.step-title-text{
+    display: inline-block;
+    white-space: pre-wrap;
+    cursor: default;
+    font-size: 18px;
+    font-weight: 300;
+}
+
+.step-x-of-x-text{
+    color: #333;
+    cursor: default;
+    flex-grow: 1;
+    text-align: right;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 41px;
+}
+
+.circle_launch_btn{
+    font-size: 44px;
+    height: 132px;
+    line-height: 129px;
+    margin: 0 auto 26px;
+    width: 132px;
+    border: 3px solid #6d9ec4;
+    border-radius: 50%;
+    background-color: white;
+}
+
+.circle_launch_btn:hover{
+    background-color: #cbcfd4;
+}
+
+.circle_launch_btn:focus{outline :none;}
+
+#icon-question{
+    font-size: 50px;
+    color:#6d9ec4;
+}
+
+.launch-button-label{
+    font-size: 24px;
+    margin-left: 41px;
+}
+
+.start-quiz-search-icon{
+    height: 19px;
+    left: 24px;
+    position: absolute;
+    top: 25px;
+    width: 18px;
+    z-index: 1;
+}
+
+.launch_btn{
+    width: 120px;
+}
+
+.step-2{
+    border-top: 1px solid #ccc;
+    height: 80px;
+}
+
+.step-2-content{
+    display: none;
+}
+
+.step-circle-text-disabled, .text-disabled{
+    color: rgba(51,51,51,.5);
+    font-weight: inherit;
+}
+
+.step-circle-disabled{
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
+.checked_radio{
+    background-color: #f0f0f0;
+}
 

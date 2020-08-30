@@ -3,8 +3,186 @@
 {% block title %}Room{% endblock %}
 {% block content %}
     {% if user.is_authenticated %}
-        <h1>Lorem ipsum</h1>
+        <div class="row">
+            <div class="col-sm d-inline-flex p-2">
+                <div class="p-2 position-relative"><h1>Rooms</h1></div>
+            </div>
+            <div class="col-sm p-2">
+                <div class="p-2 float-right"><a href="{% url 'rooms' %}" class="btn btn-warning btn-add-room"
+                                                id="btn-add-room"
+                                                style="border-radius: 30px;
+    font-size:26px; color: #fff" data-toggle="modal" data-target="#insert_data">Add room</a></div>
+            </div>
+        </div>
+        <div class="row">
+             <div class="alert alert-success" id="upt_success" style="display:none">
+
+              </div>
+               <div class="alert alert-danger" id="upt_error" style="display:none">
+
+              </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table">
+                    <table class="table">
+                        <tr>
+                            <th>ROOM ID</th>
+                            <th>ROOM NAME</th>
+                            <th>STATUS</th>
+                            <th>DELETE</th>
+                        </tr>
+                        <tbody>
+                        {% for r in rooms %}
+                            <tr>
+                                <td>{{ r.id }}</td>
+                                <td>{{ r.name }}</td>
+                                <td>{{ r.status }}</td>
+                                <td>
+                                    <button type="button" class="delete_question"><img
+                                            src="{% static 'image/trash.png' %}" class="trash"
+                                            style="height: 20px"></button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="insert_data" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+
+                        <h4 class="modal-title">Insert Room</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label>Room name: </label>
+                            <input type="text" name="room_name" id="ins_name" class="form-control"
+                                   placeholder="Room name">
+                        </div>
+                        <div class="form-group">
+                            <input type="button" name="submit" class="btn btn-block btn-info btn-insert-data"
+                                   value="INSERT ROOM">
+                        </div>
+                        <div class="form-group">
+                            <div class="alert alert-success" id="ins_success" style="display:none">
+
+                            </div>
+                            <div class="alert alert-danger" id="ins_error" style="display:none">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     {% else %}
         <h1>Please Login first.</h1>
     {% endif %}
+    <script>
+        $(document).ready(function () {
+            $(".btn-change-name").on('click', function () {
+                $(this).siblings('button').show();
+                $(this).hide();
+            })
+            $(".btn-cancel").on('click', function () {
+                $(this).hide()
+                $(this).siblings('.btn-save-room').hide();
+                $(this).siblings('.btn-change-name').show();
+            })
+
+            $(".btn-insert-data").on('click', function () {
+                let room_name = $("#ins_name").val();
+                if (room_name === '') {
+                    $("#ins_error").text("Please Enter a Room Name")
+                    $("#ins_error").show()
+                    return;
+                } else {
+                    $(".btn-insert-data").attr("disabled", "disabled");
+                    $(".btn-insert-data").text("Inserting... Please Wait..");
+                    $.ajax({
+                        url: '{% url 'rooms' %}',
+                        type: 'POST',
+                        data: {room_name: room_name}
+                    })
+                        .done(function (response) {
+                            if (response['error'] == false) {
+                                $("#ins_error").hide();
+                                $("#ins_success").text(response['error_message']);
+                                $("#ins_success").show();
+                                let html_data = `<tr>
+                                <td>`+response['id']+`</td>
+                                <td>`+room_name+`
+                                </td>
+                                <td>`+response['status']+`</td>
+                                <td>
+                                    <button type="button" class="delete_question"><img
+                                            src="{% static 'image/trash.png' %}" class="trash"
+                                            style="height: 20px"></button>
+                                </td>
+                            </tr>`;
+                                $(".table tbody").append(html_data);
+                            } else {
+                                $("#ins_success").hide();
+                                $("#ins_error").text(response['errorMessage']);
+                                $("#ins_error").show();
+                            }
+                        })
+                        .fail(function (response) {
+                            $("#ins_success").hide();
+                            $("#ins_error").text("something went wrong");
+                            $("#ins_error").show();
+                        })
+                        .always(function () {
+                            $(".btn-insert-data").removeAttr("disabled");
+                            $(".btn-insert-data").text("INSERT ROOM");
+                        })
+                }
+            })
+
+            $(document).on('click', '.delete_question', function () {
+               var target = $(this);
+               target.attr("disabled", "disabled");
+               target.text("DELETING...");
+               let id = target.parent().parent().children().first().text()
+                $.ajax({
+                url:'{% url 'delete_room' %}',
+                type:'POST',
+                data:{id:id}
+            })
+            .done(function(response){
+                if(response['error']===false){
+                    target.parent().parent().remove();
+                    $("#upt_error").hide();
+                    $("#upt_success").text(response['errorMessage']);
+                    $("#upt_success").show();
+
+                }
+                else{
+                    $("#upt_success").hide();
+                    $("#upt_error").text(response['errorMessage']);
+                    $("#upt_error").show();
+                }
+            })
+            .fail(function(){
+                 $("#upt_success").hide();
+                 $("#upt_error").text("Something Went Wrong!");
+                 $("#upt_error").show();
+            });
+            });
+        })
+
+    </script>
 {% endblock %}

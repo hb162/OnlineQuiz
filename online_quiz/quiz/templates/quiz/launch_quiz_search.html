@@ -1,0 +1,17 @@
+{% if quiz %}
+    {% for q in quiz %}
+        <tr>
+
+            <td>
+                <p class="quiz_title_launch">{{ q.title }}</p>
+            </td>
+            <td>
+                <p>{{ q.created_date }}</p>
+            </td>
+            <td><input type="radio" name="radio_launch" class="radio_launch"></td>
+        </tr>
+
+    {% endfor %}
+{% else %}
+    <p>Not found</p>
+{% endif %}

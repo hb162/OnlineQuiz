@@ -1,0 +1,208 @@
+{% extends 'quiz/index.html' %}
+{% load static %}
+{% block title %}
+    Launch Quiz
+{% endblock %}
+{% block content %}
+    <br>
+    <div id="launch_quiz" class="text-center"><h1>Launch Quiz</h1></div>
+    <hr style="width: 100%">
+    <form method="post">
+        {% csrf_token %}
+        <div class="step-1">
+            <div class="step-circle">
+                <span class="step-circle-text step-circle-text-active text-1">1</span>
+            </div>
+            <span class="step-title-text title-1">Choose Quiz</span>
+            <span class="step-x-of-x-text x-1 float-right">Step 1 <i>of</i> 2</span>
+            <br><br>
+            <div class="step-1-content">
+                <div class="search-quizz">
+                    <div class="search-div">
+                        <input type="text" onkeyup="myFunction()" id="search_input" placeholder="Search Quiz">
+                    </div>
+                </div>
+                <br>
+                <h5>QUIZZES</h5>
+                <br>
+
+                {# list of quiz#}
+
+                <table id="list_quiz" class="table sortable">
+                    <thead>
+                    <tr>
+                        <th data-column="title" style="font-weight: normal">Title</th>
+                        <th data-column="date" style="font-weight: normal">Date</th>
+                        <th data-column="#" style="font-weight: normal"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% include 'quiz/launch_quiz_search.html' %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="step-2-container">
+            <br>
+            <div class="step-circle step-circle-disabled">
+                <span class="step-circle-text step-circle-text-disabled text-2">2</span>
+            </div>
+            <span class="step-title-text text-disabled title-2">Choose Room</span>
+            <span class="step-x-of-x-text x-2 float-right text-disabled">Step 2 <i>of</i> 2</span>
+            <br><br>
+            <div class="step-2-content">
+                <div class="search-quizz">
+                    <div class="search-div">
+                        <input type="text" onkeyup="myFunction2()" id="search_input_2" placeholder="Search Room">
+                    </div>
+                </div>
+                <br>
+                <h5>ROOMS</h5>
+                <br>
+
+                {# list of ROOM#}
+
+                <table id="list_room" class="table sortable">
+                    <thead>
+                    <tr>
+                        <th data-column="title" style="font-weight: normal">Id</th>
+                        <th data-column="date" style="font-weight: normal">Name</th>
+                        <th data-column="#" style="font-weight: normal"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% include 'quiz/room_search_result.html' %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="launch_footer">
+            <button type="button" class="btn btn-outline-warning launch_btn" id="previous" disabled>Previous
+            </button>
+            <button type="button" class="btn btn-warning float-right launch_btn" id="next" disabled>Next</button>
+            <button type="button" class="btn btn-warning float-right launch_btn" id="start-room" style="display: none" disabled>
+                Start
+            </button>
+        </div>
+    </form>
+
+{% endblock %}
+{% block footer %}
+    <script>
+        function myFunction() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("search_input");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("list_quiz");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+
+                    }
+                }
+            }
+        }
+
+        function myFunction2() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("search_input_2");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("list_room");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="{% static 'js/sorttable.js' %}" type="text/javascript"></script>
+    <script>
+        $(document).ready(function () {
+            let quiz_title = "";
+            let name_room = "";
+            $(document).on('change', '.radio_launch', function () {
+                if ($(this).prop('checked', true)) {
+                    $("#next").attr("disabled", false);
+                    $(this).parent().parent().addClass("checked_radio");
+                    quiz_title = $(this).parent().siblings().children('.quiz_title_launch').text()
+                } else if ($(this).prop('checked', false)) {
+                    $(this).parent().parent().removeClass("checked_radio");
+                }
+            })
+
+            $("#next").on('click', function () {
+                $("#previous").attr("disabled", false);
+                $(this).hide();
+                $(".step-2-content").css("display", "block");
+                $(".launch_footer").css("display", "block");
+                $("#start-room").show();
+                $(".step-1-content").hide();
+                $(".text-1").addClass("step-circle-text-disabled").removeClass("step-circle-text-active");
+                $(".text-1").parent().addClass("step-circle-disabled");
+                $(".title-1").addClass("text-disabled");
+                $(".x-1").text('Quiz: ' + quiz_title);
+                $(".text-2").addClass("step-circle-text-active").removeClass("step-circle-text-disabled");
+                $(".text-2").parent().removeClass("step-circle-disabled");
+                $(".title-2").removeClass("text-disabled");
+                $(".x-2").removeClass("text-disabled");
+            })
+            $("#previous").on('click', function () {
+                let wrapper = $(".step-1-content");
+                wrapper.show();
+                $(this).prop('disabled', true);
+                $(".x-1").html(`Step 1 <i>of</i> 2`);
+                $(".text-1").addClass("step-circle-text-active").removeClass("step-circle-text-disabled");
+                $(".text-1").parent().removeClass("step-circle-disabled");
+                $(".title-1").removeClass("text-disabled");
+                $("#next").show();
+                $("#start-room").hide();
+                $(".step-2-content").hide();
+                $(".text-2").addClass("step-circle-text-disabled").removeClass("step-circle-text-active");
+                $(".text-2").parent().addClass("step-circle-disabled");
+                $(".title-2").addClass("text-disabled");
+                $(".x-2").addClass("text-disabled");
+            })
+            $(document).on('change', '.radio_launch_room', function () {
+                if ($(this).prop('checked', true)) {
+                    $("#start-room").attr("disabled", false);
+                    $(this).parent().parent().addClass("checked_radio");
+                    name_room = $(this).parent().siblings().children('.room_title').text()
+                    console.log(name_room)
+                } else if ($(this).prop('checked', false)) {
+                    $(this).parent().parent().removeClass("checked_radio");
+                }
+            })
+            $("#start-room").on('click', function () {
+                $.ajax({
+                    type: "POST",
+                    url: '{% url 'launch_quiz' %}',
+                    data: {
+                        quiz: quiz_title,
+                        room: name_room
+                    },
+                    success: function () {
+                        window.location = "{% url 'quiz_result' %}"
+                        alert("yes")
+                    },
+                    error: function () {
+                        alert("fail")
+                    }
+                });
+            })
+        })
+    </script>
+{% endblock %}

@@ -81,6 +81,12 @@ class Quiz(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def total_question(self):
+        questions = self.questions_set.all()
+        total = questions.count()
+        return total
+
 
 class QuizCopy1(models.Model):
     title = models.CharField(max_length=255)
@@ -99,9 +105,14 @@ class QuizCopy2(models.Model):
 
 
 class Room(models.Model):
+    STATUS = (
+        ('1', 'active'),
+        ('0', 'deactive')
+    )
     name = models.CharField(max_length=50)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, blank=True, null=True)
+    status = models.CharField(choices=STATUS, default='0', max_length=1)
 
 
 class Questions(models.Model):
@@ -129,7 +140,7 @@ class Questions(models.Model):
 class ResultsTest(models.Model):
     scores = models.IntegerField()
     percentage = models.FloatField()
-    date = models.DateTimeField()
+    date = models.DateTimeField(auto_now=True)
     student_name = models.CharField(max_length=50)
 
 

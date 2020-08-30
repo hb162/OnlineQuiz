@@ -15,7 +15,7 @@
                         <div class="p-2 position-relative">
                             <label><i class="fas fa-pen" style="font-size: 25px"></i>
                                 <input type="text" name="quiz-title" id="quiz-title" class="quiz_title"
-                                       placeholder="Title">
+                                       placeholder="Title" value="{{ quiz.title }}">
                             </label>
                         </div>
                     </div>
@@ -30,7 +30,6 @@
                 </div>
                 <br><br>
 
-
                 {#form question#}
                 <div class="bound">
                     <div class="form_question" id="form_question">
@@ -39,22 +38,25 @@
                                 {% for number, title in i.title_data.items %}
                                     <div class="row qs_title_save_db">
                                         <div class="col-xl-1">{{ number }}</div>
-                                        <div class="col-xl-9 editable">{{ title }}</div>
+                                        <div class="col-xl-9 editable_title">{{ title }}</div>
                                         <div class="col-xl-2">
-                                            <button type="button" class="edit_question"><i class="fas fa-pencil-alt s"></i></button>
-                                            <button type="button" class="delete_question"><img src="{% static 'image/trash.png' %}" class="trash" style="height: 22px"></button>
+                                            <button type="button" class="edit_question"><i
+                                                    class="fas fa-pencil-alt s"></i></button>
+                                            <button type="button" class="delete_question"><img
+                                                    src="{% static 'image/trash.png' %}" class="trash"
+                                                    style="height: 22px"></button>
                                         </div>
                                     </div>
                                 {% endfor %}
                                 <div class="qs_save_db">
                                     {% for key, value in i.choices_data.items %}
                                         {% if key in i.correct_choices %}
-                                            <div class="row ten">
+                                            <div class="row ten" id="{{ key }}">
                                                 <div class="col-xl-1 correct_ans">{{ key }}</div>
                                                 <div class="col-xl-9 correct_ans editable">{{ value }}</div>
                                             </div>
                                         {% else %}
-                                            <div class="row ten">
+                                            <div class="row ten" id="{{ key }}">
                                                 <div class="col-xl-1">{{ key }}</div>
                                                 <div class="col-xl-9 editable">{{ value }}</div>
                                             </div>
@@ -196,10 +198,43 @@
             $(document).ready(function () {
 
                 $(document).on('click', '.edit_question', function () {
-                    $(".editable").each(function () {
-                        let value = $(this).text()
-                        console.log(value)
-                    })
+                    {#let title = $(this).parent('div').siblings('.editable_title');#}
+                    {#let ans = $(this).parent('div').parent('div').siblings('div').children('div').children('.editable').each(function () {#}
+                    {#    console.log($(this).text())#}
+                    //{#})#}
+                    let qs = $(this).parent('div').parent('div').parent('div');
+                    qs.children().hide();
+                    let content_html = `
+                        <div class="row">
+                        <div class="col-xl-1 qs_label">
+                                <label for="question_title" class="incr">{{quiz.title}}</label>
+                            </div>
+                            <div class="col-xl-10 qs">
+                                {% for q in questions %}
+                                    {% if q.parents == qs %}
+                                        {% for number, value in q.title_data.items %}
+                                <input type="text" id="question_title" name="question_title"
+                                       placeholder="Have a multiple-choice question to ask?"
+                                       class="question_title form-control inline" value={{ value }}>
+                                <a href="javascript:void(0);" class="remove_question"><i class="fa fa-trash inline faw"
+                                                                                         aria-hidden="true"></i></a>
+                                <br>
+                                <div class="question_wrapper" id="all_answer"></div>
+                                <button class="add_selector" type="button">&#43;Add Answer</button>
+                                <div class="explain">
+                                    <input type="text" class="question_explain" id="exp"
+                                           placeholder="An explaination, if you like">
+                                    <label for="exp" class="label_explain">i</label>
+                                </div>
+                            </div>
+                            <div class="end-question"></div>
+                        </div>
+                            {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+        `
+                    qs.append(content_html)
+
                 })
 
                 $(document).on('click', '.qs_correct', function () {

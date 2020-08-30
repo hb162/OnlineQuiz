@@ -6,6 +6,7 @@
     <title>{% block title %}
         Online Quiz
     {% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/quizz.css' %}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
           integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
@@ -45,14 +46,15 @@
 </head>
 <body>
 <div class="containter">
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e9f2fd;">
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #8cb4d2;">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01"
                 aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
             <a class="navbar-brand" href="{% url 'index' %}">
-                <img src="{% static 'image/logo.png' %}" width="70" height="30" class="d-inline-block align-top" alt=""
+                <img src="{% static 'image/quiz_logo.png' %}" width="80" height="80" class="d-inline-block align-top"
+                     alt=""
                      loading="lazy">
 
             </a>
@@ -66,7 +68,10 @@
                             class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="rooms" href="{% url 'rooms' %}">Rooms<span class="sr-only">(current)</span></a>
+                    <a class="nav-link" id="rooms" href="{% url 'rooms' %}">Rooms</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="result" href="{% url 'quiz_result' %}">Result</a>
                 </li>
             </ul>
             <div class="form-inline my-2 my-lg-0">
@@ -95,54 +100,61 @@
                             </li>
                         </ul>
                     </div>
-                {% endif %}
-            </div>
 
-            <div class="modal fade" id="singinmodal" tabindex="-1" role="dialog" aria-labelledby="singinmodal"
-                 aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form>
-                                <div class="form-group">
-                                    <a href="{% url 'student_sign_in' %}"
-                                       class="btn btn-outline-primary btn-lg col-md-12 ml-auto">Student
-                                        Login</a>
-                                </div>
-                                <div class="form-group">
-                                    <a href="{% url 'teacher_sign_in' %}"
-                                       class="btn btn-outline-warning btn-lg col-md-12 ml-auto">Teacher
-                                        Login</a>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <p>Don't have an account</p>
-                            <a href="{% url 'teacher_signup' %}" target="_blank">Sign Up now!</a>
-                        </div>
                     </div>
+                    </div>
+                    </nav>
+                    <div class="container">
+                        {% block content %}
+                            <div>
+                                <a href="{% url 'launch_quiz' %}"><button type="button" class="circle_launch_btn">
+                                <i class="fas fa-file-alt" id="icon-question"></i>
+                                </button></a>
+                            </div>
+                            <span class="launch-button-label">Quiz</span>
+                        {% endblock %}
+                    </div>
+
+                {% endif %}
+    </div>
+    {# modal sign in #}
+    <div class="modal fade" id="singinmodal" tabindex="-1" role="dialog" aria-labelledby="singinmodal"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <a href="{% url 'student_sign_in' %}"
+                               class="btn btn-outline-primary btn-lg col-md-12 ml-auto">Student
+                                Login</a>
+                        </div>
+                        <div class="form-group">
+                            <a href="{% url 'teacher_sign_in' %}"
+                               class="btn btn-outline-warning btn-lg col-md-12 ml-auto">Teacher
+                                Login</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <p>Don't have an account</p>
+                    <a href="{% url 'teacher_signup' %}" target="_blank">Sign Up now!</a>
                 </div>
             </div>
         </div>
-    </nav>
-    <div class="container">
-        {% block content %}
-
-        {% endblock %}
     </div>
 
 
 
-    {% block footer %}
-    {% endblock %}
-    <footer>
-        <h1>Lorem ipsum</h1>
-    </footer>
+{% block footer %}
+
+{% endblock %}
+
 </div>
 </body>
 </html>

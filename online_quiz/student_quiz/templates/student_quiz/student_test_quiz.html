@@ -1,0 +1,50 @@
+{% extends 'student_quiz/quiz_test_index.html' %}
+{% load static %}
+{% block content %}
+   <div class="row">
+        <div class="col-sm d-inline-flex p-2">
+            <div class="p-2 position-relative"><h1>Rooms</h1></div>
+        </div>
+        <div class="col-sm p-2">
+            <div class="p-2 float-right"><a href="#" class="btn btn-warning btn-add-room"
+                                            id="btn-finish-quiz"
+                                            style="border-radius: 30px; font-size:20px; width: 150px; color: #fff">FINISH QUIZ</a></div>
+        </div>
+   </div>
+    <div id="quiz"></div>
+    <button id="submit">Submit Quiz</button>
+    <div id="results"></div>
+
+
+    <script>
+        let myQuestions = JSON.parse("{{ detail|escapejs }}");
+        myQuestions = JSON.parse(myQuestions['choices'])
+        const quizContainer = document.getElementById('quiz');
+        const resultsContainer = document.getElementById('results');
+        const submitButton = document.getElementById('submit');
+
+        function buildQuiz(){
+            const output = [];
+            myQuestions.forEach(
+                (currentQuestion, questionNumber) =>{
+                    const answer = [];
+                    for(letter in currentQuestion.choices){
+                    answer.push(
+                      `<label>
+                        <input type="radio" name="question${questionNumber}" value="${letter}">
+                        ${letter} :
+                        ${currentQuestion.choices[letter]}
+                      </label>`
+                        );
+                    }
+                    output.push(
+                        `<div class="question">${currentQuestion.question_title}</div>
+                        <div class="answer">${answer.join('')}</div>`
+                    );
+                }
+            );
+            quizContainer.innerHTML = output.join('');
+        }
+        buildQuiz();
+    </script>
+{% endblock %}

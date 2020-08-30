@@ -31,7 +31,13 @@ class EmailThreading(threading.Thread):
 
 
 def index(request):
-    return render(request, 'quiz/index.html')
+    quiz = Quiz.objects.filter(teacher_id=request.user.id)
+    room = Room.objects.filter(teacher_id=request.user.id)
+    context = {
+        "quiz": quiz,
+        "room": room
+    }
+    return render(request, 'quiz/index.html', context)
 
 
 def teacher_signup(request):
@@ -209,7 +215,6 @@ def quiz_detail(request, id):
     context = {}
     quiz = Quiz.objects.filter(teacher_id=request.user.id).get(id=id)
     questions = Questions.objects.filter(quiz_id=quiz.id)
-
     context = {'quiz': quiz, 'questions': questions}
     return render(request, 'quiz/quiz_detail.html', context)
 
@@ -249,9 +254,71 @@ def add_quiz(request):
     return render(request, 'quiz/add_quiz.html')
 
 
+@csrf_exempt
 def rooms_tab(request):
-    return render(request, 'quiz/rooms_tab.html')
+    if request.method == "GET":
+        rooms = Room.objects.filter(teacher_id=request.user.id)
+        context = {'rooms': rooms}
+        return render(request, 'quiz/rooms_tab.html', context)
+    else:
+        room_name = request.POST['room_name']
+        try:
+            if Room.objects.filter(name=room_name):
+                room_data = {"error": True, "error_message": "Room name has been exists"}
+                return JsonResponse(room_data, safe=False)
+            else:
+                room = Room(name=room_name, teacher_id=request.user.id, status='0')
+                room.save()
+                room_data = {"id": room.id, "status": room.status, "error": False,
+                             "error_message": "Room create successfully."}
+                return JsonResponse(room_data, safe=False)
+        except (ValueError, AttributeError):
+            room_data = {"error": False, "error_message": "Something went wrong!"}
+            return JsonResponse(room_data, safe=False)
 
 
-def student_sign_in(request):
-    return render(request, 'quiz/student_sign_in.html')
+@csrf_exempt
+def delete_room(request):
+    room_id = request.POST.get("id")
+    try:
+        room = Room.objects.get(id=room_id)
+        room.delete()
+        room_data = {"error": False, "errorMessage": "Deleted Successfully"}
+        return JsonResponse(room_data, safe=False)
+    except (ValueError, AttributeError, ConnectionError, NameError):
+        room_data = {"error": True, "errorMessage": "Failed to Delete Data"}
+        return JsonResponse(room_data, safe=False)
+
+
+def launch_quizz(request):
+    if request.method == "POST":
+        quiz_title = request.POST["quiz"]
+        request.session['quiz_title'] = quiz_title
+        room_name = request.POST['room']
+        quiz = Quiz.objects.get(title=quiz_title).id
+        try:
+            r = Room.objects.get(name=room_name)
+            r.quiz_id = quiz
+            r.status = 1
+            r.save()
+            return HttpResponse("Success")
+        except(ValueError, AttributeError, ConnectionError):
+            return HttpResponse("error")
+    else:
+        quiz = Quiz.objects.filter(teacher_id=request.user.id)
+        room = Room.objects.filter(teacher_id=request.user.id)
+        context = {
+            "quiz": quiz,
+            "room": room
+        }
+    return render(request, 'quiz/launch_quiz.html', context)
+
+
+def quiz_result(request):
+    if request.session.has_key('quiz_title'):
+        quiz_title = request.session['quiz_title']
+        quiz = Quiz.objects.filter(title=quiz_title).first()
+        context = {'quiz': quiz}
+        return render(request, 'quiz/quiz_result.html', context)
+    else:
+        return HttpResponse("ERROR")

@@ -1,0 +1,15 @@
+{% if room %}
+    {% for r in room %}
+        <tr>
+            <td>
+                <p class="room_id">{{ r.id }}</p>
+            </td>
+            <td>
+                 <p class="room_title">{{ r.name }}</p>
+            </td>
+            <td><input type="radio" name="room_radio" class="radio_launch_room"></td>
+        </tr>
+    {% endfor %}
+{% else %}
+    <p>Not found</p>
+{% endif %}
