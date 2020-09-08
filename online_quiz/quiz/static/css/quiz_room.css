@@ -1,9 +1,180 @@
-.room_name{
-    font-size:35px;
+.room_name {
+    font-size: 35px;
     font-weight: lighter;
-    color:white;
+    color: white;
 }
 
-.bound{
+.bound {
     background-color: #8cb4d2;
+}
+
+.bound-1 {
+    text-align: center;
+    position: relative;
+}
+
+.answers {
+    text-align: center;
+}
+
+.slide {
+    text-align: center;
+    width: 100%;
+    position: absolute;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.5s;
+    margin-top: 50px;
+}
+
+.active-slide {
+    opacity: 1;
+    z-index: 2;
+}
+
+.quiz-container {
+    position: absolute;
+    height: 500px;
+    margin-top: 40px;
+}
+
+.button_nav {
+    position: static;
+}
+
+
+.checkbox-round {
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border-radius: 50%;
+    vertical-align: middle;
+    border: 1px solid #ddd;
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.checkbox-round:checked {
+    background-color: #6d9ec4;
+}
+
+.square {
+    background: #fff;
+    color: #000000;
+    width: 45px;
+    height: 45px;
+    float: left;
+    border: 1px solid #000000;
+    text-align: center;
+}
+
+h {
+    height: 50%;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-drop {
+    font-size: 30px;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #fff;
+}
+
+.show {
+    display: block;
+}
+
+#main-container {
+    padding: 0;
+    position: relative;
+    z-index: 5;
+    min-height: 100%;
+    width: 100%;
+}
+
+#take_quiz_container {
+    padding: 4em 0;
+}
+
+#enter_name_container {
+    border-radius: 5px;
+    position: relative;
+    width: 32em;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 1em 0 2em;
+    text-align: center;
+    font-size: 14px;
+    background: #dfeaf3;
+}
+
+.enter_name {
+    width: 100%;
+    vertical-align: middle;
+    text-align: center;
+    display: inline-block;
+    max-width: 100%;
+    font-size: 1rem;
+}
+
+.input_container {
+    width: 90%;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.input_block {
+    border: 1px solid transparent;
+    position: relative;
+    max-width: 100%;
+}
+
+#student-name-input {
+    height: 50px;
+    width: 100%;
+    margin: 2em 0;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+.button-large {
+    border-radius: 5px;
+    width: 90px;
+    min-height: 42px;
+    padding: 0 15px;
+    line-height: 42px;
+    font-size: 12px;
+}
+
+.button-primary {
+    background-color: #ffa100;
+    color: #fff;
+    border: 1px solid #ffa100;
+    text-transform: uppercase;
 }

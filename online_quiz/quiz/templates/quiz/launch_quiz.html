@@ -4,6 +4,34 @@
     Launch Quiz
 {% endblock %}
 {% block content %}
+    <style>
+        .checkbox_launch {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            vertical-align: middle;
+            border: 1px solid #ddd;
+            -webkit-appearance: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .checkbox_launch:checked {
+            background-color: #6d9ec4;
+        }
+
+        .lbl_launch {
+            margin-bottom: 5px;
+            margin-left: 15px;
+            margin-top: 8px;
+        }
+
+        .setting_room {
+            margin-left: 30px;
+            margin-bottom: 30px;
+        }
+    </style>
     <br>
     <div id="launch_quiz" class="text-center"><h1>Launch Quiz</h1></div>
     <hr style="width: 100%">
@@ -47,40 +75,58 @@
             <div class="step-circle step-circle-disabled">
                 <span class="step-circle-text step-circle-text-disabled text-2">2</span>
             </div>
-            <span class="step-title-text text-disabled title-2">Choose Room</span>
+            <span class="step-title-text text-disabled title-2">Choose Room and Settings</span>
             <span class="step-x-of-x-text x-2 float-right text-disabled">Step 2 <i>of</i> 2</span>
             <br><br>
             <div class="step-2-content">
-                <div class="search-quizz">
-                    <div class="search-div">
-                        <input type="text" onkeyup="myFunction2()" id="search_input_2" placeholder="Search Room">
+                <div class="row">
+                    <div class="col-xl-9" style="border-right: 1px solid #000; height: 100%;">
+                        <div class="search-quizz">
+                            <div class="search-div">
+                                <input type="text" onkeyup="myFunction2()" id="search_input_2"
+                                       placeholder="Search Room">
+                            </div>
+                        </div>
+                        <br>
+                        <h5>ROOMS</h5>
+                        <br>
+
+                        {# list of ROOM#}
+
+                        <table id="list_room" class="table sortable">
+                            <thead>
+                            <tr>
+                                <th data-column="title" style="font-weight: normal">Id</th>
+                                <th data-column="date" style="font-weight: normal">Name</th>
+                                <th data-column="#" style="font-weight: normal"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% include 'quiz/room_search_result.html' %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-xl-3 vl">
+                        <div class="row setting_room">
+                            <input type="checkbox" class="checkbox_launch" id="required_name"
+                                   name="required_name1" value="Required Name">
+                            <label for="student_checkbox" class="lbl_launch">Required Name</label>
+                        </div>
+                        <div class="row setting_room">
+                            <input type="checkbox" class="checkbox_launch" id="shuffle_question"
+                                   name="shuffle_question1" value="Shuffle Question">
+                            <label for="student_checkbox" class="lbl_launch">Shuffle Question</label>
+                        </div>
                     </div>
                 </div>
-                <br>
-                <h5>ROOMS</h5>
-                <br>
-
-                {# list of ROOM#}
-
-                <table id="list_room" class="table sortable">
-                    <thead>
-                    <tr>
-                        <th data-column="title" style="font-weight: normal">Id</th>
-                        <th data-column="date" style="font-weight: normal">Name</th>
-                        <th data-column="#" style="font-weight: normal"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% include 'quiz/room_search_result.html' %}
-                    </tbody>
-                </table>
             </div>
         </div>
         <div class="launch_footer">
             <button type="button" class="btn btn-outline-warning launch_btn" id="previous" disabled>Previous
             </button>
             <button type="button" class="btn btn-warning float-right launch_btn" id="next" disabled>Next</button>
-            <button type="button" class="btn btn-warning float-right launch_btn" id="start-room" style="display: none" disabled>
+            <button type="button" class="btn btn-warning float-right launch_btn" id="start-room" style="display: none"
+                    disabled>
                 Start
             </button>
         </div>
@@ -134,6 +180,8 @@
         $(document).ready(function () {
             let quiz_title = "";
             let name_room = "";
+            let req_name = "No";
+            let shuffle_question = "No";
             $(document).on('change', '.radio_launch', function () {
                 if ($(this).prop('checked', true)) {
                     $("#next").attr("disabled", false);
@@ -181,16 +229,37 @@
                     $("#start-room").attr("disabled", false);
                     $(this).parent().parent().addClass("checked_radio");
                     name_room = $(this).parent().siblings().children('.room_title').text()
-                    console.log(name_room)
                 } else if ($(this).prop('checked', false)) {
                     $(this).parent().parent().removeClass("checked_radio");
                 }
             })
+
+            $(document).on('click', '#required_name', function () {
+                if ($(this).prop('checked') === false) {
+                    req_name = 'No'
+                } else {
+                    req_name = 'Yes'
+                }
+            })
+
+
+            $("#shuffle_question").on('click', function () {
+                if ($(this).prop('checked') === false) {
+                    console.log("no")
+                    shuffle_question = "No"
+                } else {
+                    shuffle_question = "Yes"
+                }
+            })
+
+
             $("#start-room").on('click', function () {
                 $.ajax({
                     type: "POST",
                     url: '{% url 'launch_quiz' %}',
                     data: {
+                        req_name: req_name,
+                        is_shuffle: shuffle_question,
                         quiz: quiz_title,
                         room: name_room
                     },
@@ -201,7 +270,7 @@
                     error: function () {
                         alert("fail")
                     }
-                });
+                })
             })
         })
     </script>

@@ -230,7 +230,6 @@ def add_quiz(request):
             quiz_title = dict_quiz[0]['quiz-title']
             Quiz.objects.create(
                 title=quiz_title,
-                subject_id=1,
                 teacher_id=request.user.id
             )
             for i in dict_data:
@@ -291,14 +290,30 @@ def delete_room(request):
 
 
 def launch_quizz(request):
+    global q1
     if request.method == "POST":
         quiz_title = request.POST["quiz"]
-        request.session['quiz_title'] = quiz_title
         room_name = request.POST['room']
-        quiz = Quiz.objects.get(title=quiz_title).id
+        required_name = request.POST['req_name']
+        shuffle_question = request.POST['is_shuffle']
+        quiz = Quiz.objects.get(title=quiz_title)
         try:
+            questions = Questions.objects.filter(quiz_id=quiz.id)
             r = Room.objects.get(name=room_name)
-            r.quiz_id = quiz
+            if required_name == 'Yes':
+                r.required_name = 1
+            if shuffle_question == 'No':
+                q1 = QuizCopy1.objects.create(title=quiz.title)
+                for q in questions:
+                    QuestionCopy1.objects.create(title=q.title,
+                                                 explain=q.explain,
+                                                 choices=q.choices,
+                                                 correct_choices=q.correct_choices,
+                                                 quiz1_id=q1.id)
+                ResultsTest.objects.create(date=datetime.datetime.now(), quiz_id=quiz.id, room_id=r.id,
+                                           teacher_id=request.user.id, status=1)
+            print(q1.id)
+            r.quiz1_id = q1.id
             r.status = 1
             r.save()
             return HttpResponse("Success")
@@ -315,10 +330,13 @@ def launch_quizz(request):
 
 
 def quiz_result(request):
-    if request.session.has_key('quiz_title'):
-        quiz_title = request.session['quiz_title']
-        quiz = Quiz.objects.filter(title=quiz_title).first()
-        context = {'quiz': quiz}
-        return render(request, 'quiz/quiz_result.html', context)
-    else:
-        return HttpResponse("ERROR")
+    if request.method == "GET":
+        rs = ResultsTest.objects.filter(teacher_id=request.user.id, room__status=1)
+        s = []
+        for result in rs:
+            s.append(result)
+        return render(request, 'quiz/quiz_result.html', {'s': s})
+
+
+def report_tab(request):
+    return render(request, 'quiz/report.html')

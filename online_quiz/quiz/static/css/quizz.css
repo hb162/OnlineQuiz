@@ -324,3 +324,23 @@ footer {
     background-color: #f0f0f0;
 }
 
+.checkbox_launch {
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border-radius: 50%;
+    vertical-align: middle;
+    border: 1px solid #ddd;
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.checkbox_launch:checked {
+    background-color: #6d9ec4;
+}
+
+.setting_room{
+    margin-left: 30px;
+}
+

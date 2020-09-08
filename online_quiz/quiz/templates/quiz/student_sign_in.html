@@ -19,8 +19,7 @@
             <!-- Login Form -->
             <form method="post">
                 {% csrf_token %}
-                <label for="room"></label>
-                <input type="text" id="room" class="fadeIn third zero-raduis" name="room_name" placeholder="Room Name">
+                {{ form }}
                 <input type="submit" class="fadeIn fourth zero-raduis" value="Join">
             </form>
 

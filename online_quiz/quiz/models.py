@@ -65,17 +65,9 @@ class Teacher(AbstractBaseUser):
         return self.active
 
 
-class Subject(models.Model):
-    name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
-
-
 class Quiz(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name="quiz")
     title = models.CharField(max_length=255)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     created_date = models.DateField(default=datetime.date.today)
 
     def __str__(self):
@@ -90,15 +82,23 @@ class Quiz(models.Model):
 
 class QuizCopy1(models.Model):
     title = models.CharField(max_length=255)
-    student_choices = models.TextField(null=True, blank=True)
+    date = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
         return self.title
 
 
+class QuestionCopy1(models.Model):
+    quiz1 = models.ForeignKey(QuizCopy1, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    explain = models.TextField(null=True, blank=True)
+    choices = models.TextField()
+    correct_choices = models.TextField()
+
+
 class QuizCopy2(models.Model):
     title = models.CharField(max_length=255)
-    student_choices = models.TextField(null=True, blank=True)
+    date = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
         return self.title
@@ -109,16 +109,23 @@ class Room(models.Model):
         ('1', 'active'),
         ('0', 'deactive')
     )
+    REQUIRED_NAME = (
+        ('1', 'required'),
+        ('2', 'not required')
+    )
     name = models.CharField(max_length=50)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, blank=True, null=True)
+    quiz1 = models.ForeignKey(QuizCopy1, on_delete=models.CASCADE, blank=True, null=True)
+    quiz2 = models.ForeignKey(QuizCopy2, on_delete=models.CASCADE, blank=True, null=True)
     status = models.CharField(choices=STATUS, default='0', max_length=1)
+    required_name = models.BooleanField(default=0, choices=REQUIRED_NAME)
+
+    def __str__(self):
+        return self.name
 
 
 class Questions(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    quiz1 = models.ForeignKey(QuizCopy1, on_delete=models.CASCADE, null=True, blank=True)
-    quiz2 = models.ForeignKey(QuizCopy2, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=255)
     explain = models.TextField(null=True, blank=True)
     choices = models.TextField()
@@ -138,13 +145,21 @@ class Questions(models.Model):
 
 
 class ResultsTest(models.Model):
-    scores = models.IntegerField()
-    percentage = models.FloatField()
+    STATUS = (
+        ('1', 'active'),
+        ('0', 'deactive')
+    )
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
-    student_name = models.CharField(max_length=50)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    status = models.CharField(max_length=1, choices=STATUS, default=0)
 
 
 class ResultDetail(models.Model):
     result = models.ForeignKey(ResultsTest, on_delete=models.CASCADE)
-    quiz1 = models.ForeignKey(QuizCopy1, on_delete=models.CASCADE, null=True, blank=True)
-    quiz2 = models.ForeignKey(QuizCopy2, on_delete=models.CASCADE, null=True, blank=True)
+    student_name = models.CharField(max_length=50, null=True, blank=True)
+    scores = models.IntegerField(default=0)
+    student_choice = models.TextField(null=True, blank=True)
+
+

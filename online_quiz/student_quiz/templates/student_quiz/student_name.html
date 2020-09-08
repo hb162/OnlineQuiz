@@ -1,0 +1,47 @@
+{% extends 'student_quiz/quiz_test_index.html' %}
+{% load static %}
+{% block content %}
+    <div id="main-container">
+        <div id="take_quiz_container">
+            <div id="enter_name_container">
+                <div class="enter_name">
+                    <form method="post">
+                        {% csrf_token %}
+                        <h3>Enter your name</h3>
+                        <span class="input_container">
+                            <div class="input_block">
+                                <input id="student-name-input" maxlength="50" placeholder="John, Cena"
+                                       type="text" name="std-name">
+                            </div>
+                        </span>
+                        <button type="submit" id="submit-name-button" class="button button-primary button-large">Done
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{#    <script>#}
+{#        $(document).ready(function () {#}
+{##}
+{#            $("#submit-name-button").on('click', function () {#}
+{#                let name = $("#student-name-input").val();#}
+{#                console.log(name)#}
+{#                $.ajax({#}
+{#                    type: "POST",#}
+{#                    url: '{% url 'sign_in_name' %}',#}
+{#                    data: {#}
+{#                        studentName: name,#}
+{#                    },#}
+{#                    success: function () {#}
+{#                        window.location = "{% url 'quiz_test' %}"#}
+{#                        alert("yes")#}
+{#                    },#}
+{#                    error: function () {#}
+{#                        alert("fail")#}
+{#                    }#}
+{#                });#}
+{#            })#}
+{#        })#}
+{#    </script>#}
+{% endblock %}

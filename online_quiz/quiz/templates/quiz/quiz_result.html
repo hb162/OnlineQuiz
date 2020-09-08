@@ -5,16 +5,18 @@
 {% endblock %}
 {% block content %}
     {% if user.is_authenticated %}
-        <div class="row">
-            <div class="col-sm d-inline-flex p-2">
-                <div class="p-2 position-relative"><span style="font-size: 30px">{{ quiz.title }}</span></div>
+        {% for i in s %}
+            <div class="row">
+                <div class="col-sm d-inline-flex p-2">
+                    <div class="p-2 position-relative"><span style="font-size: 30px">{{ i.quiz.title }}</span></div>
+                </div>
+                <div class="col-sm p-2">
+                    <div class="p-2 float-right"><a href="#" class="btn btn-warning btn-add-room"
+                                                    id="btn-finish-quiz"
+                                                    style="border-radius: 30px;font-size:20px; width: 150px; color: #fff" >FINISH</a></div>
+                </div>
             </div>
-            <div class="col-sm p-2">
-                <div class="p-2 float-right"><a href="#" class="btn btn-warning btn-add-room"
-                                                id="btn-finish-quiz"
-                                                style="border-radius: 30px;font-size:20px; width: 150px; color: #fff" >FINISH</a></div>
-            </div>
-        </div>
-        <hr>
+            <hr>
+        {% endfor %}
     {% endif %}
 {% endblock %}
