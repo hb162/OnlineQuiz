@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from .utils import PasswordResetTokenGenerator
@@ -17,6 +17,9 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 import threading
 import json
+from django.core import serializers
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -262,15 +265,11 @@ def rooms_tab(request):
     else:
         room_name = request.POST['room_name']
         try:
-            if Room.objects.filter(name=room_name):
-                room_data = {"error": True, "error_message": "Room name has been exists"}
-                return JsonResponse(room_data, safe=False)
-            else:
-                room = Room(name=room_name, teacher_id=request.user.id, status='0')
-                room.save()
-                room_data = {"id": room.id, "status": room.status, "error": False,
-                             "error_message": "Room create successfully."}
-                return JsonResponse(room_data, safe=False)
+            room = Room(name=room_name, teacher_id=request.user.id, status='0')
+            room.save()
+            room_data = {"id": room.id, "status": room.status, "error": False,
+                         "error_message": "Room create successfully."}
+            return JsonResponse(room_data, safe=False)
         except (ValueError, AttributeError):
             room_data = {"error": False, "error_message": "Something went wrong!"}
             return JsonResponse(room_data, safe=False)
@@ -289,34 +288,62 @@ def delete_room(request):
         return JsonResponse(room_data, safe=False)
 
 
+def check_before_launch_quiz(request):
+    if Room.objects.filter(status=1, teacher_id=request.user.id).first():
+        warning_data = {"warning": True, "warning_message": "There is a Quiz is launching. Would you like to end that?"}
+        return JsonResponse(warning_data)
+    else:
+        warning_data = {"warning": False}
+        return JsonResponse(warning_data)
+
+
+@csrf_exempt
 def launch_quizz(request):
-    global q1
     if request.method == "POST":
         quiz_title = request.POST["quiz"]
         room_name = request.POST['room']
         required_name = request.POST['req_name']
         shuffle_question = request.POST['is_shuffle']
         quiz = Quiz.objects.get(title=quiz_title)
+        questions = Questions.objects.filter(quiz_id=quiz.id)
+        q_filter = Questions.objects.filter(quiz_id=quiz.id).values("title", "choices", "explain", "correct_choices")
+        r = Room.objects.get(name=room_name)
+
         try:
-            questions = Questions.objects.filter(quiz_id=quiz.id)
-            r = Room.objects.get(name=room_name)
             if required_name == 'Yes':
                 r.required_name = 1
+            elif required_name == 'No':
+                r.required_name = 0
+                # Trường hợp không shuffle câu hỏi
             if shuffle_question == 'No':
-                q1 = QuizCopy1.objects.create(title=quiz.title)
-                for q in questions:
-                    QuestionCopy1.objects.create(title=q.title,
-                                                 explain=q.explain,
-                                                 choices=q.choices,
-                                                 correct_choices=q.correct_choices,
-                                                 quiz1_id=q1.id)
-                ResultsTest.objects.create(date=datetime.datetime.now(), quiz_id=quiz.id, room_id=r.id,
-                                           teacher_id=request.user.id, status=1)
-            print(q1.id)
-            r.quiz1_id = q1.id
+                # Check câu hỏi và quiz có bị thay đổi không
+                quiz_copy1 = QuizCopy1.objects.filter(title=quiz.title, teacher_id=request.user.id).order_by('-date').first()
+                if quiz_copy1 is not None:
+                    question_copy_1 = QuestionCopy1.objects.filter(quiz1_id=quiz_copy1.id).values("title", "choices", "explain", "correct_choices")
+                    if list(question_copy_1) == list(q_filter):
+                        r.quiz1_id = quiz_copy1.id
+                        ResultsTest.objects.create(date=datetime.datetime.now(), quiz_id=quiz.id, room_id=r.id,
+                                                   teacher_id=request.user.id, status=1)
+                # Câu hỏi và quiz bị thay đổi hoặc chưa tồn tại
+                else:
+                    quiz_launch = QuizCopy1.objects.create(title=quiz.title, teacher_id=request.user.id)
+                    for q in questions:
+                        r.is_shuffle = 0
+                        r.quiz1_id = quiz_launch.id
+                        QuestionCopy1.objects.create(title=q.title,
+                                                     explain=q.explain,
+                                                     choices=q.choices,
+                                                     correct_choices=q.correct_choices,
+                                                     quiz1_id=quiz_launch.id)
+                    ResultsTest.objects.create(date=datetime.datetime.now(), quiz_id=quiz.id, room_id=r.id,
+                                               teacher_id=request.user.id, status=1)
+            elif shuffle_question == 'Yes':
+                r.is_shuffle = 1
+                quiz_launch = QuizCopy2.objects.create(title=quiz.title)
             r.status = 1
             r.save()
             return HttpResponse("Success")
+
         except(ValueError, AttributeError, ConnectionError):
             return HttpResponse("error")
     else:
@@ -330,13 +357,74 @@ def launch_quizz(request):
 
 
 def quiz_result(request):
+    std_choice = ""
+    result_detail = ""
+    q_correct = []
+    list_correct = {}
     if request.method == "GET":
-        rs = ResultsTest.objects.filter(teacher_id=request.user.id, room__status=1)
-        s = []
-        for result in rs:
-            s.append(result)
-        return render(request, 'quiz/quiz_result.html', {'s': s})
+        try:
+            rs = ResultsTest.objects.get(teacher_id=request.user.id, room__status=1, status=1)
+            q = Quiz.objects.get(id=rs.quiz_id)
+            questions = Questions.objects.filter(quiz_id=q.id)
+            for i in questions:
+                q_correct.append(i.correct_choices)
+            for k, v in enumerate(q_correct):
+                list_correct[k] = v
+            list_correct = json.dumps(list_correct)
+            result_detail = ResultDetail.objects.filter(result_id=rs.id)
+            if result_detail is not None:
+                for j in result_detail:
+                    if not j.student_choice:
+                        print("None")
+                    else:
+                        std_choice = json.dumps(j.student_choice_data)
+                context = {'result_test': rs, 'rs_detail': result_detail,
+                           'std_choice': std_choice,
+                           'q': q, 'correct': list_correct}
+                return render(request, 'quiz/quiz_result_single_room.html', context)
+            else:
+                return render(request, 'quiz/quiz_result_single_room.html', {'result_test': rs, 'q': q})
+        except ResultsTest.DoesNotExist:
+            rs = None
+            return HttpResponse('<div style="color:red"><h1>NONE OF QUIZ IS RUNNING NOW! CLICK BACK BUTTON TO BACK TO MAIN MENU</h1></div>')
+
+
+def end_quiz(request):
+    r = Room.objects.get(teacher_id=request.user.id, status=1)
+    r.quiz1_id = None
+    r.quiz2_id = None
+    r.required_name = 0
+    r.is_shuffle = 0
+    r.status = 0
+    rt = ResultsTest.objects.get(room_id=r.id, teacher_id=request.user.id, status=1)
+    rt.status = 0
+    r.save()
+    rt.save()
+    return redirect('report')
 
 
 def report_tab(request):
-    return render(request, 'quiz/report.html')
+    rooms = Room.objects.all()
+    rst = ResultsTest.objects.filter(status=0, teacher_id=request.user.id).order_by('-date')
+    if request.method == "GET":
+        context = {'result_test': rst,
+                   'rooms': rooms}
+        return render(request, 'quiz/report.html', context)
+    else:
+        room_select = request.POST['room_select']
+        rp_search = request.POST['rp_search']
+        q = Quiz.objects.filter(title__contains=rp_search).first()
+        result_filter = ResultsTest.objects.filter(teacher_id=request.user.id, room__name=room_select,
+                                                   quiz__title=q)
+        if result_filter:
+            context = {'rooms': rooms, 'result': result_filter}
+            return render(request, 'quiz/report.html', context)
+        else:
+            messages.add_message(request, messages.ERROR, 'Search Not Found!')
+            return render(request, 'quiz/report.html', {'rooms': rooms})
+
+
+def report_detail(request, pk):
+    result_detail = ResultDetail.objects.filter(result_id=pk)
+    context = {'result_detail': result_detail}
+    return render(request, 'quiz/report_detail.html', context)

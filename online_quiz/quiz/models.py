@@ -52,6 +52,9 @@ class Teacher(AbstractBaseUser):
     def __str__(self):
         return self.username
 
+    class Meta:
+        db_table = 'teacher'
+
     @property
     def is_staff(self):
         return self.staff
@@ -79,13 +82,24 @@ class Quiz(models.Model):
         total = questions.count()
         return total
 
+    @property
+    def all_questions(self):
+        return self.questions_set
+
+    class Meta:
+        db_table = 'quiz'
+
 
 class QuizCopy1(models.Model):
     title = models.CharField(max_length=255)
     date = models.DateTimeField(default=datetime.datetime.now())
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        db_table = 'quizcopy1'
 
 
 class QuestionCopy1(models.Model):
@@ -95,6 +109,9 @@ class QuestionCopy1(models.Model):
     choices = models.TextField()
     correct_choices = models.TextField()
 
+    class Meta:
+        db_table = 'questions_copy1'
+
 
 class QuizCopy2(models.Model):
     title = models.CharField(max_length=255)
@@ -102,6 +119,9 @@ class QuizCopy2(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        db_table = 'quiz_copy2'
 
 
 class Room(models.Model):
@@ -111,17 +131,26 @@ class Room(models.Model):
     )
     REQUIRED_NAME = (
         ('1', 'required'),
-        ('2', 'not required')
+        ('0', 'not required')
     )
+    SHUFFLE = (
+        ('1', 'shuffle'),
+        ('0', 'not shuffle')
+    )
+
     name = models.CharField(max_length=50)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     quiz1 = models.ForeignKey(QuizCopy1, on_delete=models.CASCADE, blank=True, null=True)
     quiz2 = models.ForeignKey(QuizCopy2, on_delete=models.CASCADE, blank=True, null=True)
-    status = models.CharField(choices=STATUS, default='0', max_length=1)
-    required_name = models.BooleanField(default=0, choices=REQUIRED_NAME)
+    status = models.CharField(choices=STATUS, default=0, max_length=1)
+    required_name = models.CharField(default=0, choices=REQUIRED_NAME, max_length=1)
+    is_shuffle = models.CharField(default=0, choices=SHUFFLE, max_length=1)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        db_table = 'room'
 
 
 class Questions(models.Model):
@@ -143,6 +172,9 @@ class Questions(models.Model):
     def correct_choices_data(self):
         return json.loads(self.correct_choices)
 
+    class Meta:
+        db_table = 'questions'
+
 
 class ResultsTest(models.Model):
     STATUS = (
@@ -155,6 +187,9 @@ class ResultsTest(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     status = models.CharField(max_length=1, choices=STATUS, default=0)
 
+    class Meta:
+        db_table = 'result_test'
+
 
 class ResultDetail(models.Model):
     result = models.ForeignKey(ResultsTest, on_delete=models.CASCADE)
@@ -162,4 +197,12 @@ class ResultDetail(models.Model):
     scores = models.IntegerField(default=0)
     student_choice = models.TextField(null=True, blank=True)
 
+    def __str__(self):
+        return self.student_name
 
+    @property
+    def student_choice_data(self):
+        return json.loads(self.student_choice)
+
+    class Meta:
+        db_table = 'result_detail'

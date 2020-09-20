@@ -5,32 +5,7 @@
 {% endblock %}
 {% block content %}
     <style>
-        .checkbox_launch {
-            width: 40px;
-            height: 40px;
-            background-color: white;
-            border-radius: 50%;
-            vertical-align: middle;
-            border: 1px solid #ddd;
-            -webkit-appearance: none;
-            outline: none;
-            cursor: pointer;
-        }
 
-        .checkbox_launch:checked {
-            background-color: #6d9ec4;
-        }
-
-        .lbl_launch {
-            margin-bottom: 5px;
-            margin-left: 15px;
-            margin-top: 8px;
-        }
-
-        .setting_room {
-            margin-left: 30px;
-            margin-bottom: 30px;
-        }
     </style>
     <br>
     <div id="launch_quiz" class="text-center"><h1>Launch Quiz</h1></div>
@@ -108,14 +83,24 @@
                     </div>
                     <div class="col-xl-3 vl">
                         <div class="row setting_room">
-                            <input type="checkbox" class="checkbox_launch" id="required_name"
-                                   name="required_name1" value="Required Name">
-                            <label for="student_checkbox" class="lbl_launch">Required Name</label>
+                            {#                            <input type="checkbox" class="checkbox_launch" id="required_name"#}
+                            {#                                   name="required_name1" value="Required Name">#}
+                            {#                            <label for="required_name" class="lbl_launch">Required Name</label>#}
+                            <label class="toggle" for="required_name">
+                                <input type="checkbox" id="required_name">
+                                <div class="slider"></div>
+                                Required Name
+                            </label>
                         </div>
                         <div class="row setting_room">
-                            <input type="checkbox" class="checkbox_launch" id="shuffle_question"
-                                   name="shuffle_question1" value="Shuffle Question">
-                            <label for="student_checkbox" class="lbl_launch">Shuffle Question</label>
+{#                            <input type="checkbox" class="checkbox_launch" id="shuffle_question"#}
+{#                                   name="shuffle_question1" value="Shuffle Question">#}
+{#                            <label for="student_checkbox" class="lbl_launch">Shuffle Question</label>#}
+                            <label class="toggle" for="shuffle_question">
+                                <input type="checkbox" id="shuffle_question">
+                                <div class="slider"></div>
+                                Shuffle Question
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -254,6 +239,7 @@
 
 
             $("#start-room").on('click', function () {
+
                 $.ajax({
                     type: "POST",
                     url: '{% url 'launch_quiz' %}',
@@ -265,7 +251,6 @@
                     },
                     success: function () {
                         window.location = "{% url 'quiz_result' %}"
-                        alert("yes")
                     },
                     error: function () {
                         alert("fail")

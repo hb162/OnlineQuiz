@@ -1,6 +1,9 @@
 {% extends 'student_quiz/quiz_test_index.html' %}
 {% load static %}
 {% block content %}
+    <div class="loader_bg">
+        <div class="loader"></div>
+    </div>
     <div class="row">
         <div class="col-sm d-inline-flex p-2">
             <div class="p-2 position-relative">
@@ -13,13 +16,15 @@
             </div>
         </div>
         <div class="col-sm p-2">
-            <div class="p-2 float-right"><a href="#" class="btn btn-warning btn-add-room"
-                                            id="btn-finish-quiz"
-                                            style="border-radius: 30px; font-size:20px; width: 150px; color: #fff">FINISH
-                QUIZ</a>
+            <div class="p-2 float-right"><button class="btn btn-warning btn-add-room"
+                                            id="std-btn-finish-quiz"
+                                            style="border-radius: 30px; font-size:20px; width: 150px; color: #fff"
+             data-toggle="modal" data-target="#modal-finish-quiz">FINISH
+                QUIZ</button>
             </div>
         </div>
     </div>
+
     <hr>
     <div class="bound-1">
         <div class="quiz_container">
@@ -30,12 +35,35 @@
             <button id="next_quiz" class="btn btn-warning">Next Question</button>
         </div>
     </div>
+
+    <div class="modal fade" id="modal-finish-quiz" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Please Confirm</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to finish the quiz
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-warning" data-dismiss="modal" id="no-modal">No</button>
+                    <button type="button" class="btn btn-warning" id="confirm-finish">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         let myQuestions = JSON.parse("{{ detail|escapejs }}");
         const quizContainer = document.getElementById('quiz');
         const resultsContainer = document.getElementById('results');
         const submitButton = document.getElementById('btn-finish-quiz');
+        const confirmSubmitBtn = document.getElementById('confirm-finish');
         const questionNav = document.getElementById("question_nav");
+        let scores = 0;
 
         function buildQuiz() {
             const output = [];
@@ -102,11 +130,11 @@
                 }
 
             });
-
-            alert(`${(numCorrect / myQuestions.length * 100).toFixed(2)}%,<div>correct:${numCorrect}/${myQuestions.length}</div>`);
+            scores = numCorrect;
+            alert(`percentage: ${(numCorrect / myQuestions.length * 100).toFixed(2)}% \ncorrect: ${numCorrect}/${myQuestions.length}`);
         }
 
-        submitButton.addEventListener('click', showResults);
+        confirmSubmitBtn.addEventListener('click', showResults);
         const previousButton = document.getElementById("previous_quiz");
         const nextButton = document.getElementById("next_quiz");
         const slides = document.querySelectorAll(".slide");
@@ -189,14 +217,87 @@
             })
         }
 
-        function checkSlide(){
+        function checkSlide() {
             let currentSlide = 0;
 
         }
 
+        setTimeout(function () {
+            $('.loader_bg').fadeToggle();
+
+        }, 1500);
+
+        if (history.pushState !== undefined) {
+            history.pushState(null, null, location.href);
+        }
+        history.back();
+        history.forward();
+        window.onpopstate = function () {
+            history.go(1);
+        };
+
+        $(window).bind({
+            beforeunload: function (ev) {
+                ev.preventDefault();
+            },
+            unload: function (ev) {
+                ev.preventDefault();
+            }
+        });
         $('#question_nav a').on('click', function (e) {
             $(this.id).addClass("active-slide").fadeIn().siblings('div').removeClass('active-slide');
         });
+
+        $("#no-modal").on('click', function () {
+            $("#btn-finish-quiz").text("FINISH QUIZ");
+        })
+
+        $("#btn-finish-quiz").on('click', function () {
+            $(this).html(
+            `<div class="spinner">
+                <div class="rect1"></div>
+                <div class="rect2"></div>
+                <div class="rect3"></div>
+                <div class="rect4"></div>
+                <div class="rect5"></div>
+            </div>
+            `)
+        })
+        $("#confirm-finish").on('click', function (e) {
+            e.preventDefault();
+            let answers = [];
+            let student_answers = {};
+            let i = 1;
+            $(".slide").each(function () {
+                $(this).children('.answers').children().children().children('input:checked').each(function () {
+                    answers.push($(this).val());
+                })
+                student_answers[i] = answers;
+                i += 1;
+                answers = [];
+            })
+            let json_data = JSON.stringify(student_answers);
+            $.ajax({
+                type: "POST",
+                url: '{% url 'finish_quiz' %}',
+                data: {
+                    score: scores,
+                    student_answer_data: json_data
+                },
+                success: function () {
+                    window.location.replace("{% url 'wait_after_finish' %}")
+                    window.history.pushState(null, "", window.location.href);
+                    window.onpopstate = function () {
+                        window.history.pushState(null, "", window.location.href);
+                    };
+                    alert("yes")
+                },
+                error: function () {
+                    alert("fail")
+                }
+            });
+
+        })
 
     </script>
 

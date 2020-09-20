@@ -40,7 +40,7 @@
                             <i class="fa fa-trash" aria-hidden="true"></i>
                             <button type="button" class="btn btn outline-info">Delete</button>
                             <input type="checkbox" class="custom-control-input float-right" id="checkall"
-                            onchange="checkAll(this)">
+                                   onchange="checkAll(this)">
                             <label class="custom-control-label float-right" for="checkall">All</label>
                         </div>
                     </div>
@@ -49,23 +49,18 @@
         </div>
 
         {# list of quiz#}
-        <div class="row">
-            <div class="col-sm-1"></div>
-            <div class="col-sm-10">
-                <table id="list_quiz" class="table sortable">
-                    <thead>
-                    <tr>
-                        <th data-column="title" style="font-weight: normal">Title</th>
-                        <th data-column="date" style="font-weight: normal">Date</th>
-                        <th data-column="#" style="font-weight: normal"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% include 'quiz/quiz_search_result.html' %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <table id="list_quiz" class="sortable rp_table">
+            <thead>
+            <tr>
+                <th data-column="title" style="font-weight: normal">Title</th>
+                <th data-column="date" style="font-weight: normal">Date</th>
+                <th data-column="#" style="font-weight: normal">#</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% include 'quiz/quiz_search_result.html' %}
+            </tbody>
+        </table>
 
     {% else %}
         <h1>Please Login first.</h1>

@@ -10,7 +10,7 @@
                         <h3>Enter your name</h3>
                         <span class="input_container">
                             <div class="input_block">
-                                <input id="student-name-input" maxlength="50" placeholder="John, Cena"
+                                <input id="student-name-input" maxlength="20" placeholder="John, Cena"
                                        type="text" name="std-name">
                             </div>
                         </span>
@@ -19,29 +19,41 @@
                     </form>
                 </div>
             </div>
+            {% if messages %}
+            <div class="alert alert-danger" id="std-error">
+                {% for msg in messages %}
+                    {{ msg }}
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
     </div>
-{#    <script>#}
-{#        $(document).ready(function () {#}
-{##}
-{#            $("#submit-name-button").on('click', function () {#}
-{#                let name = $("#student-name-input").val();#}
-{#                console.log(name)#}
-{#                $.ajax({#}
-{#                    type: "POST",#}
-{#                    url: '{% url 'sign_in_name' %}',#}
-{#                    data: {#}
-{#                        studentName: name,#}
-{#                    },#}
-{#                    success: function () {#}
-{#                        window.location = "{% url 'quiz_test' %}"#}
-{#                        alert("yes")#}
-{#                    },#}
-{#                    error: function () {#}
-{#                        alert("fail")#}
-{#                    }#}
-{#                });#}
-{#            })#}
-{#        })#}
-{#    </script>#}
+    <script>
+        $(document).ready(function () {
+            if (history.pushState !== undefined) {
+                history.pushState(null, null, location.href);
+            }
+            history.back();
+            history.forward();
+            window.onpopstate = function () {
+                history.go(1);
+            };
+            $("#submit-name-button").on('click', function () {
+                let name = $("#student-name-input").val();
+                $.ajax({
+                    type: "POST",
+                    url: '{% url 'sign_in_name' %}',
+                    data: {
+                        studentName: name,
+                    },
+                    success: function () {
+                        window.location = "{% url 'quiz_test' %}"
+                    },
+                    error: function (response) {
+                    }
+                });
+
+            })
+        })
+    </script>
 {% endblock %}

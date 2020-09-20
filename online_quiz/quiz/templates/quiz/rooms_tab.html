@@ -15,12 +15,12 @@
             </div>
         </div>
         <div class="row">
-             <div class="alert alert-success" id="upt_success" style="display:none">
+            <div class="alert alert-success" id="upt_success" style="display:none">
 
-              </div>
-               <div class="alert alert-danger" id="upt_error" style="display:none">
+            </div>
+            <div class="alert alert-danger" id="upt_error" style="display:none">
 
-              </div>
+            </div>
         </div>
         <div class="row">
             <div class="col-lg-12">
@@ -118,31 +118,33 @@
                         data: {room_name: room_name}
                     })
                         .done(function (response) {
-                            if (response['error'] == false) {
+                            if (response['error'] === false) {
                                 $("#ins_error").hide();
                                 $("#ins_success").text(response['error_message']);
                                 $("#ins_success").show();
                                 let html_data = `<tr>
-                                <td>`+response['id']+`</td>
-                                <td>`+room_name+`
+                                <td>` + response['id'] + `</td>
+                                <td>` + room_name + `
                                 </td>
-                                <td>`+response['status']+`</td>
+                                <td>` + response['status'] + `</td>
                                 <td>
                                     <button type="button" class="delete_question"><img
                                             src="{% static 'image/trash.png' %}" class="trash"
                                             style="height: 20px"></button>
                                 </td>
-                            </tr>`;
+                                </tr>`;
                                 $(".table tbody").append(html_data);
                             } else {
+                                console.log("else" +response)
                                 $("#ins_success").hide();
                                 $("#ins_error").text(response['errorMessage']);
                                 $("#ins_error").show();
                             }
                         })
                         .fail(function (response) {
+                            console.log("fail" + response);
                             $("#ins_success").hide();
-                            $("#ins_error").text("something went wrong");
+                            $("#ins_error").text("something went wrong or room name has exists");
                             $("#ins_error").show();
                         })
                         .always(function () {
@@ -153,34 +155,33 @@
             })
 
             $(document).on('click', '.delete_question', function () {
-               var target = $(this);
-               target.attr("disabled", "disabled");
-               target.text("DELETING...");
-               let id = target.parent().parent().children().first().text()
+                var target = $(this);
+                target.attr("disabled", "disabled");
+                target.text("DELETING...");
+                let id = target.parent().parent().children().first().text()
                 $.ajax({
-                url:'{% url 'delete_room' %}',
-                type:'POST',
-                data:{id:id}
-            })
-            .done(function(response){
-                if(response['error']===false){
-                    target.parent().parent().remove();
-                    $("#upt_error").hide();
-                    $("#upt_success").text(response['errorMessage']);
-                    $("#upt_success").show();
+                    url: '{% url 'delete_room' %}',
+                    type: 'POST',
+                    data: {id: id}
+                })
+                    .done(function (response) {
+                        if (response['error'] === false) {
+                            target.parent().parent().remove();
+                            $("#upt_error").hide();
+                            $("#upt_success").text(response['errorMessage']);
+                            $("#upt_success").show();
 
-                }
-                else{
-                    $("#upt_success").hide();
-                    $("#upt_error").text(response['errorMessage']);
-                    $("#upt_error").show();
-                }
-            })
-            .fail(function(){
-                 $("#upt_success").hide();
-                 $("#upt_error").text("Something Went Wrong!");
-                 $("#upt_error").show();
-            });
+                        } else {
+                            $("#upt_success").hide();
+                            $("#upt_error").text(response['errorMessage']);
+                            $("#upt_error").show();
+                        }
+                    })
+                    .fail(function () {
+                        $("#upt_success").hide();
+                        $("#upt_error").text("Something Went Wrong!");
+                        $("#upt_error").show();
+                    });
             });
         })
 

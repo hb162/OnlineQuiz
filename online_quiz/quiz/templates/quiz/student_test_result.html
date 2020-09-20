@@ -1,0 +1,9 @@
+{% for j in rs_detail %}
+            <p>asd</p>
+            {{ j.student_name }}
+            {% for key, value in j.student_choice.items %}
+                {{ value.pk }}
+                {% endfor %}
+
+
+        {% endfor %}

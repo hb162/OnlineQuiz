@@ -1,0 +1,94 @@
+{% extends 'quiz/index.html' %}
+{% load static %}
+{% block title %}
+    Quiz Result
+{% endblock %}
+{% block content %}
+    {% if user.is_authenticated %}
+        <div class="row">
+            <div class="col-sm d-inline-flex p-2">
+                <div class="p-2 position-relative"><span style="font-size: 30px">{{ q.title }}</span></div>
+            </div>
+            <div class="col-sm p-2">
+                <div class="p-2 float-right">
+                    <button class="btn btn-warning btn-add-room"
+                            id="btn-finish-quiz"
+                            style="border-radius: 30px;font-size:20px; width: 150px; color: #fff" data-target="#finishing-room"
+                            data-toggle="modal">FINISH
+                    </button>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <table id="result_table" align="left" border="1px;">
+            <tr class="tr-result">
+                <th class="name_column">Name</th>
+                {% with ''|center:q.total_question as range %}
+                    {% for rs in range %}
+                        <th class="answer_column">
+                            {{ forloop.counter }}
+                        </th>
+                    {% endfor %}
+                {% endwith %}
+            </tr>
+            <tbody>
+            {% for j in rs_detail %}
+                <tr class="tr-result">
+                    {% if j.student_choice|length > 0 %}
+                        <td class="td-std-name">{{ j.student_name }}</td>
+                        {% for key, value in j.student_choice_data.items %}
+                            <td class="td-std-answer">{{ value|join:" , " }}</td>
+                        {% endfor %}
+                    {% else %}
+
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="modal fade" id="finishing-room" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Please Confirm</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to end this quiz
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-warning" data-dismiss="modal" id="no-end">No
+                        </button>
+                        <a href="{% url 'end_quiz' %}" type="button" class="btn btn-warning" id="yes-end">Yes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                $("#no-end").on('click', function () {
+                    $("#btn-finish-quiz").text("FINISH");
+                })
+
+                $("#btn-finish-quiz").on('click', function () {
+                    let correct = JSON.parse('{{ correct|escapejs }}');
+                    let std_ans = JSON.parse('{{ std_choice|escapejs }}');
+                    $(this).html(
+                        `<div class="spinner">
+                            <div class="rect1"></div>
+                            <div class="rect2"></div>
+                            <div class="rect3"></div>
+                            <div class="rect4"></div>
+                            <div class="rect5"></div>
+                    </div>
+                    `)
+                })
+            })
+        </script>
+    {% endif %}
+{% endblock %}

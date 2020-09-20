@@ -64,7 +64,7 @@ class AuthenticationForm(forms.Form):
         ),
     ])
     password = forms.CharField(widget=forms.PasswordInput(
-        attrs={'class': 'form-control fadeIn third zero-raduis', 'type': 'password', 'name': 'password', 'placeholder': 'Password'}),
+        attrs={'class': 'form-control fadeIn third zero-raduis psw-field', 'type': 'password', 'name': 'password', 'placeholder': 'Password'}),
         label='Password')
 
     class Meta:

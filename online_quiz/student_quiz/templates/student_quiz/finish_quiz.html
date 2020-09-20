@@ -1,0 +1,25 @@
+{% extends 'student_quiz/quiz_test_index.html' %}
+{% load static %}
+{% block content %}
+    <style>
+
+    </style>
+    <div id="wait-text">
+        <h1>Waiting for next activity</h1>
+    </div>
+    <div class="loader-2">
+
+    </div>
+    <script>
+        $(document).ready(function () {
+            if (history.pushState !== undefined) {
+                history.pushState(null, null, location.href);
+            }
+            history.back();
+            history.forward();
+            window.onpopstate = function () {
+                history.go(1);
+            };
+        })
+    </script>
+{% endblock %}

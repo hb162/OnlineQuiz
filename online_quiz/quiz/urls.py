@@ -14,7 +14,10 @@ urlpatterns = [
     path('teacher/quizzes/add_quiz', views.add_quiz, name='add_quiz'),
     path('teacher/quizzes/<int:id>', views.quiz_detail, name='quiz_detail'),
     path('rooms/delete/', views.delete_room, name='delete_room'),
+    path('teacher/check_launch_quiz/', views.check_before_launch_quiz, name='check_launch'),
     path('teacher/launch_quiz/', views.launch_quizz, name='launch_quiz'),
     path('teacher/quiz_result/', views.quiz_result, name='quiz_result'),
     path('teacher/report/', views.report_tab, name='report'),
+    path('teacher/end_quiz', views.end_quiz, name='end_quiz'),
+    path('teacher/report/<int:pk>', views.report_detail, name='report_detail')
 ]

@@ -59,7 +59,7 @@
 
             </a>
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item active">
+                <li class="nav-item">
                     <a class="nav-link" id="home" href="{% url 'index' %}">Home <span
                             class="sr-only">(current)</span></a>
                 </li>
@@ -74,7 +74,7 @@
                     <a class="nav-link" id="report" href="{% url 'report' %}">Report</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="result" href="{% url 'quiz_result' %}">Result</a>
+                    <a class="nav-link" id="result-nav" href="{% url 'quiz_result' %}">Result</a>
                 </li>
             </ul>
             <div class="form-inline my-2 my-lg-0">
@@ -84,6 +84,7 @@
                         Sign in
                     </button>
                 {% else %}
+
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ml-auto">
                             <li class="nav-item dropdown">
@@ -107,57 +108,84 @@
                     </div>
                     </div>
                     </nav>
+
                     <div class="container">
                         {% block content %}
                             <div>
-                                <a href="{% url 'launch_quiz' %}"><button type="button" class="circle_launch_btn">
-                                <i class="fas fa-file-alt" id="icon-question"></i>
-                                </button></a>
+                                <button type="button" id="launch-quiz-btn" class="circle_launch_btn">
+                                    <i class="fas fa-file-alt" id="icon-question"></i>
+                                </button>
                             </div>
                             <span class="launch-button-label">Quiz</span>
                         {% endblock %}
                     </div>
 
                 {% endif %}
-    </div>
-    {# modal sign in #}
-    <div class="modal fade" id="singinmodal" tabindex="-1" role="dialog" aria-labelledby="singinmodal"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <a href="{% url 'student_sign_in' %}"
-                               class="btn btn-outline-primary btn-lg col-md-12 ml-auto">Student
-                                Login</a>
-                        </div>
-                        <div class="form-group">
-                            <a href="{% url 'teacher_sign_in' %}"
-                               class="btn btn-outline-warning btn-lg col-md-12 ml-auto">Teacher
-                                Login</a>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <p>Don't have an account</p>
-                    <a href="{% url 'teacher_signup' %}" target="_blank">Sign Up now!</a>
-                </div>
+</div>
+{# modal sign in #}
+<div class="modal fade" id="singinmodal" tabindex="-1" role="dialog" aria-labelledby="singinmodal"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <a href="{% url 'student_sign_in' %}"
+                           class="btn btn-outline-primary btn-lg col-md-12 ml-auto" target="_blank">Student
+                            Login</a>
+                    </div>
+                    <div class="form-group">
+                        <a href="{% url 'teacher_sign_in' %}"
+                           class="btn btn-outline-warning btn-lg col-md-12 ml-auto" target="_blank">Teacher
+                            Login</a>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <p>Don't have an account</p>
+                <a href="{% url 'teacher_signup' %}" target="_blank">Sign Up now!</a>
             </div>
         </div>
     </div>
-
-
+</div>
 
 {% block footer %}
 
 {% endblock %}
 
 </div>
+<script>
+    $(document).ready(function () {
+        $("#launch-quiz-btn").on('click', function () {
+            $.ajax({
+                url: '{% url 'check_launch' %}',
+                type: 'POST',
+                dataType: "json",
+                success: function (data) {
+                    if(data['warning'] === true){
+                        if(confirm(data['warning_message'])){
+                            jQuery.ajax({
+                            type:"POST",
+                            url:'{% url 'end_quiz' %}'
+                          }).done(function(){
+                               window.location = "{% url 'launch_quiz' %}"
+                          })
+                        }
+                    }else{
+                        window.location = "{% url 'launch_quiz' %}"
+                    }
+                },
+                failure: function (data) {
+                    alert('Got an error dude');
+                }
+             });
+         })
+    })
+</script>
 </body>
 </html>

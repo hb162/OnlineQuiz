@@ -7,21 +7,31 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link href="{% static 'css/login.css' %}" rel="stylesheet"/>
+    <style>
+
+    </style>
 </head>
 <body>
 {% block login %}
     <div class="wrapper fadeInDown zero-raduis">
         <div id="formContent">
             <div class="fadeIn first">
-                <img src="{% static 'image/quiz_logo.png' %}" id="icon" alt="User Icon" />
+                <img src="{% static 'image/quiz_logo.png' %}" id="icon" alt="User Icon"/>
             </div>
 
             <!-- Login Form -->
             <form method="post">
                 {% csrf_token %}
                 {{ form }}
-                <input type="submit" class="fadeIn fourth zero-raduis" value="Join">
+                <input type="submit" class="fadeIn fourth zero-raduis" id="btn-join-room" value="Join">
             </form>
+            {% if messages %}
+            <div class="alert alert-danger" id="room-fail-msg">
+                {% for msg in messages %}
+                    {{ msg }}
+                {% endfor %}
+            </div>
+            {% endif %}
 
 
         </div>

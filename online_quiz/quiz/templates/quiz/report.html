@@ -4,4 +4,96 @@
     Report
 {% endblock %}
 {% block content %}
+    {% if user.is_authenticated %}
+
+        <div class="row">
+            <div class="col-sm d-inline-flex p-2">
+                <div class="p-2 position-relative"><h1>Report</h1></div>
+            </div>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="rp-search-bar">
+                <div class="rp-search-container">
+                    <div class="rp-search-div">
+                        <input type="text" name="rp_search" maxlength="255" id="rp-search-input" placeholder="Search">
+                        <div id="div-btn-search">
+                            <button type="submit" class="btn btn-primary" id="rp-btn-search">Search</button>
+                        </div>
+                    </div>
+                    <div class="rp-filter-div">
+                        <div class="select-container">
+                            <select class="custom-select" id="rp-custom-select" name="room_select">
+                                {% for room in rooms %}
+                                    <option value="{{ room.name }}">{{ room.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rp-search-noti">
+                {% for m in messages %}
+                    <span>{{ m }}</span>
+                {% endfor %}
+            </div>
+            <div class="state-change">
+                <button class="state-change-btn btn " disabled><i class="fa fa-trash" aria-hidden="true"></i> DELETE
+                </button>
+            </div>
+            <table class="rp-table" align="center">
+                <tr>
+                    <th class="rp-all-col">All</th>
+                    <th class="rp-name-col">NAME</th>
+                    <th class="rp-date-col">DATE</th>
+                    <th class="rp-room-col">ROOM</th>
+                </tr>
+                <tbody>
+                {% if result.count > 0 %}
+                    {% for i in result %}
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td><a href="{% url 'report_detail' i.pk %}"><u>{{ i.quiz }}</u></a></td>
+                            <td>{{ i.date| date:'d/m/Y H:i' }}</td>
+                            <td>{{ i.room }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    {% for rs in result_test %}
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td><a href="{% url 'report_detail' rs.pk %}"><u>{{ rs.quiz }}</u></a></td>
+                        <td>{{ rs.date| date:'d/m/Y H:i' }}</td>
+                        <td>{{ rs.room }}</td>
+                    </tr>
+                {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>
+        </form>
+        <script>
+            {#$(document).ready(function () {#}
+            {#    $("#rp-btn-search").on('click', function () {#}
+            {#        let search_text = $("#rp-search-input").val();#}
+            {#        let room_select = $( "#rp-custom-select option:selected" ).text();#}
+            {#         $.ajax({#}
+            {#            type: "POST",#}
+            {#            url: '{% url 'report' %}',#}
+            {#            data: {#}
+            {#                search_text: search_text,#}
+            {#                room_select: room_select#}
+            {#            },#}
+            {#             dataType: 'json',#}
+            {#            success: function (data) {#}
+            {#                let result = JSON.parse(data)#}
+            {#                console.log(result)#}
+            {#            },#}
+            {#            error: function () {#}
+            {#                $("#search-result").text("SEARCH NOT FOUND")#}
+            {#            }#}
+            {#        });#}
+            {#    })#}
+            {# })#}
+        </script>
+    {% endif %}
 {% endblock %}

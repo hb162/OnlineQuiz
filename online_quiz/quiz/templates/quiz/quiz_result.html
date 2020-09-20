@@ -5,18 +5,50 @@
 {% endblock %}
 {% block content %}
     {% if user.is_authenticated %}
-        {% for i in s %}
-            <div class="row">
-                <div class="col-sm d-inline-flex p-2">
-                    <div class="p-2 position-relative"><span style="font-size: 30px">{{ i.quiz.title }}</span></div>
-                </div>
-                <div class="col-sm p-2">
-                    <div class="p-2 float-right"><a href="#" class="btn btn-warning btn-add-room"
-                                                    id="btn-finish-quiz"
-                                                    style="border-radius: 30px;font-size:20px; width: 150px; color: #fff" >FINISH</a></div>
+        {% if rs %}
+        <div class="row">
+            <div class="col-sm d-inline-flex p-2">
+                <div class="p-2 position-relative"><span style="font-size: 30px">{{ q.title }}</span></div>
+            </div>
+            <div class="col-sm p-2">
+                <div class="p-2 float-right"><a href="{% url 'end_quiz' %}" class="btn btn-warning btn-add-room"
+                                                id="btn-finish-quiz"
+                                                style="border-radius: 30px;font-size:20px; width: 150px; color: #fff">FINISH</a>
                 </div>
             </div>
-            <hr>
-        {% endfor %}
+        </div>
+        <hr>
+        <table id="result_table" align="left" border="1px;">
+            <tr class="tr-result">
+                <th class="name_column">Name</th>
+                {% with ''|center:q.total_question as range %}
+                    {% for rs in range %}
+                        <th class="answer_column">
+                            {{ forloop.counter }}
+                        </th>
+                    {% endfor %}
+                {% endwith %}
+            </tr>
+            <tbody>
+            {% for j in rs_detail %}
+                <tr class="tr-result">
+                    {% if j.student_choice|length > 0 %}
+                        <td class="td-std-name">{{ j.student_name }}</td>
+                        {% for key, value in j.student_choice_data.items %}
+                            <td class="td-std-answer">{{ value|join:" , " }}</td>
+                        {% endfor %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+            {% else %}
+                {% block content %}
+                {% endblock %}
+            {% endif %}
+        <script>
+            let correct_choice = {{ q }};
+            console.log(correct_choice)
+        </script>
     {% endif %}
 {% endblock %}
