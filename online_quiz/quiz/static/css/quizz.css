@@ -43,6 +43,11 @@
     font-size: 20px;
 }
 
+.quiz_title:focus{
+    outline: none;
+    border: 3px solid #6d9ec4;
+}
+
 .incr {
     margin-top: 25px;
     margin-left: 42px;
@@ -137,7 +142,7 @@
     width: 30px;
 }
 
-.correct-choice {
+.correct-choice, .correct-choice-edit {
     border: 2px #06b7d8 solid;
 }
 
@@ -199,7 +204,8 @@ footer {
 
 .edit_question {
     border: 0;
-    background-color: #39f;
+    border-radius: 5px;
+    background-color: #0099c7;
 }
 
 .edit_question:hover {
@@ -209,14 +215,23 @@ footer {
 .delete_question {
     background-color: #f5f7f8;
     border: 0;
+
 }
 
 .delete_question:hover {
-    background-color: #1b70c4;
+    background-color: #fafafa;
 }
 
 .trash {
     color: #1b70c4;
+    height: 23px;
+    width: 25px;
+}
+
+.trash:focus{
+    outline: none;
+    border: 1px solid #6d9ec4;
+    background-color: #fafafa;
 }
 
 .launch_search_quiz {
@@ -327,29 +342,8 @@ footer {
     background-color: #f0f0f0;
 }
 
-/*.checkbox_launch {*/
-/*    width: 40px;*/
-/*    height: 40px;*/
-/*    background-color: white;*/
-/*    border-radius: 50%;*/
-/*    vertical-align: middle;*/
-/*    border: 1px solid #ddd;*/
-/*    -webkit-appearance: none;*/
-/*    outline: none;*/
-/*    cursor: pointer;*/
-/*}*/
-
-/*.checkbox_launch:checked {*/
-/*    background-color: #6d9ec4;*/
-/*}*/
-
-/*.lbl_launch {*/
-/*    margin-bottom: 5px;*/
-/*    margin-left: 15px;*/
-/*    margin-top: 8px;*/
-/*}*/
-
 .toggle {
+    font-size: 20px;
     margin-bottom: 5px;
     margin-left: 15px;
     margin-top: 8px;
@@ -635,4 +629,22 @@ footer {
 #rp-search-input:focus {
     outline: none !important;
     border: 2px solid #6d9ec4;
+}
+
+/*Question detail*/
+.qs-title-edit{
+    /*width: 350px;*/
+    display: inline-block;
+}
+
+.qs-label-edit{
+    width: 88%;
+}
+
+#qs-listanswer-edit{
+    display: block;
+}
+
+.qs-choices-edit{
+
 }

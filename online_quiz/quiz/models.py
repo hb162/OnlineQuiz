@@ -98,6 +98,12 @@ class QuizCopy1(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def total_question(self):
+        questions = self.questioncopy1_set.all()
+        total = questions.count()
+        return total
+
     class Meta:
         db_table = 'quizcopy1'
 
@@ -184,7 +190,8 @@ class ResultsTest(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    quiz1 = models.ForeignKey(QuizCopy1, on_delete=models.CASCADE, blank=True, null=True)
+    quiz2 = models.ForeignKey(QuizCopy2, on_delete=models.CASCADE, blank=True, null=True)
     status = models.CharField(max_length=1, choices=STATUS, default=0)
 
     class Meta:

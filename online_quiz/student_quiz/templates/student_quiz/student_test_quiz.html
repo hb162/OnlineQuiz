@@ -69,19 +69,18 @@
             const output = [];
             myQuestions.forEach(
                 (currentQuestion, questionNumber) => {
-
-                    const title = [];
+                    title = [];
                     const num = [];
-                    for (i in currentQuestion.question_title) {
+                    {#for (i in currentQuestion.question_title) {#}
                         title.push(
-                            `<div class="num row justify-content-center"><h2>${i} of ${myQuestions.length}</h2></div>
+                            `<div class="num row justify-content-center"><h2>${questionNumber+1} of ${myQuestions.length}</h2></div>
                             <div class="row justify-content-center">
                             <label>
-                                <span name="question${questionNumber}" style="font-size: 30px">${currentQuestion.question_title[i]}</span>
+                                <span name="question${questionNumber}" style="font-size: 30px">${currentQuestion.question_title}</span>
                             </label>
                             </div>`
                         )
-                    }
+                    {# }#}
                     const answer = [];
                     for (let letter in currentQuestion.choices) {
                         answer.push(

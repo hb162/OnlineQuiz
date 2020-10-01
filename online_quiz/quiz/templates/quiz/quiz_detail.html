@@ -10,44 +10,43 @@
         <div>
             <form method="post" id="quiz">
                 {% csrf_token %}
+                {% for q in quiz %}
                 <div class="row">
                     <div class="col-xl d-inline-flex p-2">
                         <div class="p-2 position-relative">
                             <label><i class="fas fa-pen" style="font-size: 25px"></i>
                                 <input type="text" name="quiz-title" id="quiz-title" class="quiz_title"
-                                       placeholder="Title" value="{{ quiz.title }}">
+                                       placeholder="Title" value="{{ q.title }}">
                             </label>
                         </div>
                     </div>
                     <div class="col-xl p-2">
                         <div class="p-2 float-right">
-                            <button type="submit" id="saveandexit" class="btn btn-primary"
+                            <button type="button" data-id="{{ q.id }}" data-href="{% url 'quiz_detail' q.id %}" id="saveandexit" class="btn btn-primary"
                                     style="border-radius: 20px; font-size:26px">
                                 Save and exit
                             </button>
                         </div>
                     </div>
                 </div>
+                {% endfor %}
                 <br><br>
 
                 {#form question#}
                 <div class="bound">
                     <div class="form_question" id="form_question">
                         {% for i in questions %}
-                            <div class="qtn-form" id="{{ i.id|add:-1 }} ">
-                                {% for number, title in i.title_data.items %}
-                                    <div class="row qs_title_save_db">
-                                        <div class="col-xl-1">{{ number }}</div>
-                                        <div class="col-xl-9 editable_title">{{ title }}</div>
-                                        <div class="col-xl-2">
-                                            <button type="button" class="edit_question"><i
-                                                    class="fas fa-pencil-alt s"></i></button>
-                                            <button type="button" class="delete_question"><img
-                                                    src="{% static 'image/trash.png' %}" class="trash"
-                                                    style="height: 22px"></button>
-                                        </div>
+                            <div class="qtn-form" id="{{ i.id }} ">
+                                <div class="row qs_title_save_db">
+                                    <div class="col-xl-1"><i class="fa fa-circle" style="font-size:10px"></i></div>
+                                    <div class="col-xl-9 editable_title">{{ i.title }}</div>
+                                    <div class="col-xl-2">
+                                        <button data-id="{{ i.id }}" data-toggle="modal" data-href="{% url 'question_detail' i.id %}" type="button" class="edit_question"><i
+                                                class="fas fa-pencil-alt s"></i></button>
+                                        <button type="button" class="delete_question"><img
+                                                src="{% static 'image/trash.png' %}" class="trash"></button>
                                     </div>
-                                {% endfor %}
+                                </div>
                                 <div class="qs_save_db">
                                     {% for key, value in i.choices_data.items %}
                                         {% if key in i.correct_choices %}
@@ -63,10 +62,12 @@
                                         {% endif %}
                                     {% endfor %}
                                 </div>
-                                <div class="row qs_save_db">
-                                    <div class="col-xl-1"> &#33;</div>
-                                    <div class="col-xl-9 editable">{{ i.explain }}</div>
-                                </div>
+                                {% if i.explain %}
+                                    <div class="row qs_save_db">
+                                        <div class="col-xl-1" style="padding-left:3px"><i class="fas fa-exclamation"></i></div>
+                                        <div class="col-xl-9 editable" style="padding-left:3px">{{ i.explain }}</div>
+                                    </div>
+                                {% endif %}
                                 <br>
                             </div>
 
@@ -81,10 +82,64 @@
                 </div>
             </form>
         </div>
+        <div class="modal fade" id="modal-default" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Edit Question</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            {% for x in q_detail %}
+                                <label class="qs-label-edit" for="title-edit">Title
+                                    <input type="text" id="title-edit" class="qs-title-edit form-control" value="{{ x.title }}">
+                                </label>
+                                <div id="qs-listanswer-edit">
+                                    {% for key, value in x.choices_data.items %}
+                                        {% if key in x.correct_choices %}
+                                            <label class="qs-label-edit" for="{{ key }}">{{ key }}
+                                                <input type="checkbox" class="qs-checkbox-correct-edit" checked>
+                                                <input type="text" id="{{ key }}" class="qs-choices-edit form-control correct-choice-edit" value="{{ value }}">
+                                            </label>
+                                            <a href="javascript:void(0);" class="qs-remove-answer-edit">
+                                                <i class="fas fa-minus inline faw"></i></a>
+                                        {% else %}
+                                            <label class="qs-label-edit" for="{{ key }}">{{ key }}
+                                                <input type="checkbox" class="qs-checkbox-correct-edit">
+                                                <input type="text" id="{{ key }}" class="qs-choices-edit form-control" value="{{ value }}">
+                                            </label>
+                                            <a href="javascript:void(0);" class="qs-remove-answer-edit">
+                                                <i class="fas fa-minus inline faw"></i></a>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <div>
+                                        <button class="qs-add-answer-edit" type="button">&#43;Add Answer</button>
+                                    </div>
+                                    <br>
+                                </div>
+                                <label class="qs-label-edit label-explain-edit" id="label-explain-edit" for="explain-edit">Explain
+                                    <input type="text" id="explain-edit" class="qs-explain-edit form-control" value="{{ x.explain }}">
+                                </label>
+                            {% endfor %}
+
+                            <hr>
+                            <input type="reset" class="btn btn-outline-warning" value="Reset"/>
+                            <button type="button" class="btn btn-warning qs-save-edit">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <script>
             const qtnList = document.getElementById("form_question");
             const addQtnBtn = document.getElementById("add_question");
             const delQtnBtn = document.querySelector(".remove_question");
+
 
             addQtnBtn.addEventListener("click", () => {
 
@@ -100,7 +155,7 @@
                 const qtnFormContent = `
                         <div class="row">
                         <div class="col-xl-1 qs_label">
-                                <label for="question_title" class="incr">${qtnId + 1}</label>
+                                <label for="question_title" class="incr"><i class="fa fa-circle" style="font-size: 10px"></i></label>
                             </div>
                             <div class="col-xl-10 qs">
                                 <input type="text" id="question_title" name="question_title"
@@ -114,7 +169,7 @@
                                 <div class="explain">
                                     <input type="text" class="question_explain" id="exp"
                                            placeholder="An explaination, if you like">
-                                    <label for="exp" class="label_explain">i</label>
+                                    <label for="exp" class="label_explain"><i class="fas fa-exclamation"></i></label>
                                 </div>
                             </div>
                             <div class="end-question"></div>
@@ -147,7 +202,7 @@
                 while (lastQtn !== currentQtn) {
                     const prevQtn = lastQtn.previousSibling;
                     lastQtn.setAttribute("id", `${prevQtn.id}`);
-                    lastQtn.querySelector(".incr").textContent = `${parseInt(prevQtn.id) + 1}`;
+                    lastQtn.querySelector(".incr").innerHTML = `<i class="fa fa-circle" style="font-size: 10px"></i>`;
                     lastQtn = prevQtn;
                 }
                 qtnList.removeChild(currentQtn);
@@ -189,53 +244,82 @@
             }
 
 
-            /** ------------------------------------------------------- */
             const nextChar = (c) => {
                 return String.fromCharCode(c.charCodeAt(0) + 1).toUpperCase();
             }
         </script>
         <script type="text/javascript">
             $(document).ready(function () {
+                let link = "";
+                $(document).on('click', '.qs-checkbox-correct-edit', function () {
+                    if ($(this).prop('checked') === false) {
+                        $(this).parent().children('input[type="text"]').removeClass('correct-choice-edit')
+                    } else {
+                        $(this).parent().children('input[type="text"]').addClass('correct-choice-edit')
+                    }
+                })
 
                 $(document).on('click', '.edit_question', function () {
-                    {#let title = $(this).parent('div').siblings('.editable_title');#}
-                    {#let ans = $(this).parent('div').parent('div').siblings('div').children('div').children('.editable').each(function () {#}
-                    {#    console.log($(this).text())#}
-                    //{#})#}
-                    let qs = $(this).parent('div').parent('div').parent('div');
-                    qs.children().hide();
-                    let content_html = `
-                        <div class="row">
-                        <div class="col-xl-1 qs_label">
-                                <label for="question_title" class="incr">{{quiz.title}}</label>
-                            </div>
-                            <div class="col-xl-10 qs">
-                                {% for q in questions %}
-                                    {% if q.parents == qs %}
-                                        {% for number, value in q.title_data.items %}
-                                <input type="text" id="question_title" name="question_title"
-                                       placeholder="Have a multiple-choice question to ask?"
-                                       class="question_title form-control inline" value={{ value }}>
-                                <a href="javascript:void(0);" class="remove_question"><i class="fa fa-trash inline faw"
-                                                                                         aria-hidden="true"></i></a>
-                                <br>
-                                <div class="question_wrapper" id="all_answer"></div>
-                                <button class="add_selector" type="button">&#43;Add Answer</button>
-                                <div class="explain">
-                                    <input type="text" class="question_explain" id="exp"
-                                           placeholder="An explaination, if you like">
-                                    <label for="exp" class="label_explain">i</label>
-                                </div>
-                            </div>
-                            <div class="end-question"></div>
-                        </div>
-                            {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-        `
-                    qs.append(content_html)
-
+                    let question_id = $(this).data('id');
+                    link = $(this).data('href')
+                    console.log(link)
+                    $.ajax({
+                        url: link,
+                        type: 'GET',
+                        data: {question_id: question_id},
+                        success: function (response) {
+                            $('#modal-default .modal-dialog').html($('#modal-default .modal-dialog', response));
+                            $('#modal-default').modal('show');
+                        },
+                        error: function () {
+                            console.log('something went wrong here');
+                        },
+                     });
                 })
+
+                $(document).on('click', '.qs-save-edit', function (e) {
+                    console.log("click")
+                    e.preventDefault();
+                    let json_data = []
+                    let question_title = {};
+                    let answer_data = {};
+                    let explaination = "";
+                    let correct = {};
+                    let bound = $(this).parent();
+                    let answer_wrapper = $(bound).children('div[id="qs-listanswer-edit"]')
+                    question_title = ($(bound).children('label').children('input[type="text"]').val());
+                    explaination = bound.children("#label-explain-edit").children('input[type="text"]').val();
+                    answer_wrapper.children('.qs-label-edit').children('input[type="text"]').each(function () {
+                        let label = $(this).parent('label').text().trim();
+                        answer_data[label] = $(this).val();
+                    })
+                    answer_wrapper.children('.qs-label-edit').children('input.correct-choice-edit[type="text"]').each(function () {
+                        let label = $(this).parent().text().trim();
+                        correct[label] = $(this).val();
+                    })
+                    let questions_data = {
+                        "question_title": question_title,
+                        "answer_data": answer_data,
+                        "exp": explaination,
+                        "correct": correct
+                    }
+                    json_data.push(questions_data)
+                    json_data = JSON.stringify(json_data)
+                    $.ajax({
+                        url: link,
+                        type: "POST",
+                        data: {
+                            json_data: json_data
+                        },
+                        success: function () {
+                            alert("yes");
+                            location.reload();
+                        },
+                        error: function () {
+                            alert("Something went wrong!");
+                        }
+                    });
+                 })
 
                 $(document).on('click', '.qs_correct', function () {
                     if ($(this).prop("checked") === true) {
@@ -245,63 +329,94 @@
                     }
                 })
 
-                //ajax send data
+                $(document).on('click', '.delete_question', function () {
+                    let target = $(this);
+                    target.attr("disabled", "disabled");
+                    target.text("DELETING...");
+                    let q_id = target.parent().parent().parent().attr('id');
+                    $.ajax({
+                        url: '{% url 'delete_question' %}',
+                        type: "POST",
+                        data: {
+                            q_id: q_id
+                        },
+                        success: function (response) {
+                            if (response['error'] === false) {
+                                alert(response['error_message'])
+                                location.reload();
+                            } else {
+                                alert(response['error_message'])
+                            }
+                        },
+                        error: function () {
+                            alert("Something went wrong!");
+                        }
+                    });
+                })
+
+
                 $("#saveandexit").click(function (event) {
                     event.preventDefault();
+                    let link1 = $(this).data('href')
+
                     let json_data = [];
                     let question_title = {}
                     let quiz_json_data = [];
-                    let selector_data = {};
+                    let answers_data = {};
                     let quiz_title = "";
                     let correct = {};
                     let explaination = "";
                     $(".qs").each(function () {
                         $(this).each(function () {
-                            question_title[$(this).siblings('div').children('label[class="incr"]').text()] = $(this).children('input').val();
-                            console.log(question_title)
+                            question_title = $(this).children('input').val();
                         })
                         explaination = $(this).children('div[class="explain"]').children('input[type="text"]').val()
                         $(this).children('div[class="question_wrapper"]').children('div[class="test"]').each(function () {
-                            selector_data[$(this).children('label').text()] = $(this).children('input[type="text"]').val();
+                            answers_data[$(this).children('label').text()] = $(this).children('input[type="text"]').val();
                         })
                         $(this).children('div[class="question_wrapper"]').children('div[class="test"]').children('input.correct-choice[type="text"]').each(function () {
                             correct[$(this).parent('div').children('label[class="incr2"]').text()] = $(this).val();
                         })
                         let questions_data = {
                             "question_title": question_title,
-                            "selector": selector_data,
+                            "answers": answers_data,
                             "exp": explaination,
                             "correct": correct
                         }
                         json_data.push(questions_data);
-                        selector_data = {}
+                        answers_data = {}
                         question_title = {}
                         correct = {}
                     })
-                    console.log(json_data)
                     quiz_title = {"quiz-title": $("#quiz-title").val()}
                     quiz_json_data.push(quiz_title)
                     let string_question_data = JSON.stringify(json_data)
                     let string_quiz_data = JSON.stringify(quiz_json_data)
-                    {#$.ajax({#}
-                    {#    type: "POST",#}
-                    {#    url: '{% url 'add_quiz' %}',#}
-                    {#    data: {#}
-                    {#        question_data: string_question_data,#}
-                    {#        quiz_data: string_quiz_data#}
-                    {##}
-                    {#    },#}
-                    {#    success: function () {#}
-                    {#        window.location = "{% url 'quizzes' %}"#}
-                    {#        alert("yes")#}
-                    {#    },#}
-                    {#    error: function () {#}
-                    {#        alert("dmcs")#}
-                    {#    }#}
-                    //{#});#}
+                    console.log(string_question_data)
+
+                    $.ajax({
+                        type: "POST",
+                        url: $(this).attr('data-href'),
+                        data: {
+                            question_data: string_question_data,
+                            quiz_data: string_quiz_data
+
+                        },
+                        success: function (response) {
+                            if (response['error'] === false) {
+                                alert(response['error_message'])
+                                location.reload();
+                            } else {
+                               alert(response['error_message'])
+                            }
+                        },
+                        error: function () {
+                                alert("Something went wrong")
+                        }
+                     });
 
                     return false;
-                });
+                 });
             });
         </script>
     {% endif %}

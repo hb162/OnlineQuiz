@@ -72,7 +72,7 @@ def student_quiz_test(request):
         questions_detail = []
         q = dict()
         for i in questions:
-            q['question_title'] = json.loads(i.title)
+            q['question_title'] = i.title
             q['choices'] = json.loads(i.choices)
             q['correct'] = json.loads(i.correct_choices)
             questions_detail.append(q)

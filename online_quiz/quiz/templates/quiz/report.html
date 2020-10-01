@@ -38,7 +38,7 @@
                 {% endfor %}
             </div>
             <div class="state-change">
-                <button class="state-change-btn btn " disabled><i class="fa fa-trash" aria-hidden="true"></i> DELETE
+                <button type="button" class="state-change-btn btn" id="delete-report" disabled><i class="fa fa-trash" aria-hidden="true"></i> DELETE
                 </button>
             </div>
             <table class="rp-table" align="center">
@@ -52,7 +52,7 @@
                 {% if result.count > 0 %}
                     {% for i in result %}
                         <tr>
-                            <td><input type="checkbox"></td>
+                            <td><input type="checkbox" class="checkbox-delete" data-id="{{ i.id }}"></td>
                             <td><a href="{% url 'report_detail' i.pk %}"><u>{{ i.quiz }}</u></a></td>
                             <td>{{ i.date| date:'d/m/Y H:i' }}</td>
                             <td>{{ i.room }}</td>
@@ -60,40 +60,29 @@
                     {% endfor %}
                 {% else %}
                     {% for rs in result_test %}
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td><a href="{% url 'report_detail' rs.pk %}"><u>{{ rs.quiz }}</u></a></td>
-                        <td>{{ rs.date| date:'d/m/Y H:i' }}</td>
-                        <td>{{ rs.room }}</td>
-                    </tr>
-                {% endfor %}
+                        <tr>
+                            <td><input type="checkbox" class="checkbox-delete" data-id="{{ rs.id }}"></td>
+                            <td><a href="{% url 'report_detail' rs.pk %}"><u>{% firstof rs.quiz1 rs.quiz2 %}</u></a></td>
+                            <td>{{ rs.date| date:'d/m/Y H:i' }}</td>
+                            <td>{{ rs.room }}</td>
+                        </tr>
+                    {% endfor %}
                 {% endif %}
                 </tbody>
             </table>
         </form>
         <script>
-            {#$(document).ready(function () {#}
-            {#    $("#rp-btn-search").on('click', function () {#}
-            {#        let search_text = $("#rp-search-input").val();#}
-            {#        let room_select = $( "#rp-custom-select option:selected" ).text();#}
-            {#         $.ajax({#}
-            {#            type: "POST",#}
-            {#            url: '{% url 'report' %}',#}
-            {#            data: {#}
-            {#                search_text: search_text,#}
-            {#                room_select: room_select#}
-            {#            },#}
-            {#             dataType: 'json',#}
-            {#            success: function (data) {#}
-            {#                let result = JSON.parse(data)#}
-            {#                console.log(result)#}
-            {#            },#}
-            {#            error: function () {#}
-            {#                $("#search-result").text("SEARCH NOT FOUND")#}
-            {#            }#}
-            {#        });#}
-            {#    })#}
-            {# })#}
+            $(document).ready(function () {
+                $(document).on('click', '.checkbox-delete', function () {
+                    if ($(".rp-table input[type=checkbox]").is(":checked")){
+                        $("#delete-report").attr("disabled", false)
+                    }else{
+                        $("#delete-report").attr("disabled", true)
+                    }
+                    let id = $(this).data('id')
+                    console.log(id)
+                })
+            })
         </script>
     {% endif %}
 {% endblock %}

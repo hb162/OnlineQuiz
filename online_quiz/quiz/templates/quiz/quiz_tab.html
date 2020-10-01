@@ -38,7 +38,7 @@
                     <div class="col-sm-5">
                         <div class="custom-control custom-checkbox ">
                             <i class="fa fa-trash" aria-hidden="true"></i>
-                            <button type="button" class="btn btn outline-info">Delete</button>
+                            <button type="button" class="btn btn outline-info" id="delete-quiz" disabled>Delete</button>
                             <input type="checkbox" class="custom-control-input float-right" id="checkall"
                                    onchange="checkAll(this)">
                             <label class="custom-control-label float-right" for="checkall">All</label>
@@ -101,6 +101,41 @@
                 }
             }
         }
+
+        $(document).ready(function () {
+            $(document).on('click', '.checkbox-quiz', function () {
+                if ($("#list_quiz input[type=checkbox]").is(":checked")) {
+                    $("#delete-quiz").attr("disabled", false)
+                } else {
+                    $("#delete-quiz").attr("disabled", true)
+                }
+                let id = $(this).data('id')
+            })
+        })
+
+        $("#delete-quiz").on('click', function () {
+            let selected_quiz = [];
+
+            $('#list_quiz').find('tr').each(function () {
+                let row = $(this);
+                if (row.find('input[type="checkbox"]').is(':checked')) {
+                    selected_quiz.push(row.attr('data-id'))
+                }
+            });
+            selected_quiz = JSON.stringify(selected_quiz);
+            $.ajax({
+                url: "{% url 'delete_quiz' %}",
+                type: 'POST',
+                data: {'selected_quiz': selected_quiz},
+                success: function (response) {
+                    if(response['error'] === false){
+                        alert(response['error_message']);
+                    }else{
+                        alert(response['error_message']);
+                    }
+                }
+             })
+        })
     </script>
 
 

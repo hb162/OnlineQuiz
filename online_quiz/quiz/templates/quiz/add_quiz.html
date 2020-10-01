@@ -182,7 +182,7 @@
                     let explaination = "";
                     $(".qs").each(function () {
                         $(this).each(function () {
-                            question_title[$(this).siblings('div').children('label[class="incr"]').text()] = $(this).children('input').val();
+                            question_title = $(this).children('input').val();
                             console.log(question_title)
                         })
                         explaination = $(this).children('div[class="explain"]').children('input[type="text"]').val()
@@ -203,7 +203,6 @@
                         question_title = {}
                         correct = {}
                     })
-                    console.log(json_data)
                     quiz_title = {"quiz-title": $("#quiz-title").val()}
                     quiz_json_data.push(quiz_title)
                     let string_question_data = JSON.stringify(json_data)
@@ -223,7 +222,7 @@
                         error: function () {
                             alert("fail")
                         }
-                    });
+                     });
 
                     return false;
                 });

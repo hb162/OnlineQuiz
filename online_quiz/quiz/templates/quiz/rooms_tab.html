@@ -24,8 +24,8 @@
         </div>
         <div class="row">
             <div class="col-lg-12">
-                <div class="table">
-                    <table class="table">
+                <div class="">
+                    <table class="sortable rp-table" id="room-table">
                         <tr>
                             <th>ROOM ID</th>
                             <th>ROOM NAME</th>
@@ -133,7 +133,7 @@
                                             style="height: 20px"></button>
                                 </td>
                                 </tr>`;
-                                $(".table tbody").append(html_data);
+                                $("#room-table").append(html_data);
                             } else {
                                 console.log("else" +response)
                                 $("#ins_success").hide();
@@ -155,7 +155,7 @@
             })
 
             $(document).on('click', '.delete_question', function () {
-                var target = $(this);
+                let target = $(this);
                 target.attr("disabled", "disabled");
                 target.text("DELETING...");
                 let id = target.parent().parent().children().first().text()

@@ -1,6 +1,6 @@
 {% if quiz %}
     {% for q in quiz %}
-        <tr>
+        <tr data-id="{{ q.id }}">
             <td>
                 <div class=" quiz_id">
                     <a href="{% url 'quiz_detail' q.id %}">{{ q.title }}</a>
@@ -13,7 +13,7 @@
                 </div>
             </td>
             <td>
-                <input type="checkbox" name='check'>
+                <input type="checkbox" name='check' class="checkbox-quiz">
             </td>
         </tr>
 

@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
+from django.contrib.auth.forms import UserCreationForm, PasswordResetForm, PasswordChangeForm
 from django.core.validators import RegexValidator
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib import messages
@@ -105,3 +105,6 @@ class ResetNewPassword(UserCreationForm):
         model = get_user_model()
         fields = ['password1', 'password2']
 
+
+class ChangePasswordForm(PasswordChangeForm):
+    pass
