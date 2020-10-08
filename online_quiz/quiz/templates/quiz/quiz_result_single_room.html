@@ -1,5 +1,6 @@
 {% extends 'quiz/index.html' %}
 {% load static %}
+{% load quiz_result_extras %}
 {% block title %}
     Quiz Result
 {% endblock %}
@@ -22,7 +23,9 @@
         <hr>
         <table id="result_table" align="left" border="1px;">
             <tr class="tr-result">
-                <th class="name_column">Name</th>
+                <th class="name_column">
+                        <span id="span-column-name">Name</span>
+                    </th>
                 {% with ''|center:q.total_question as range %}
                     {% for rs in range %}
                         <th class="answer_column">
@@ -35,9 +38,18 @@
             {% for j in rs_detail %}
                 <tr class="tr-result">
                     {% if j.student_choice|length > 0 %}
-                        <td class="td-std-name">{{ j.student_name }}</td>
+                        <td class="td-std-name">
+                            <span>{{ j.student_name }}</span>
+                        </td>
                         {% for key, value in j.student_choice_data.items %}
-                            <td class="td-std-answer">{{ value|join:" , " }}</td>
+                            {% for key1, value1 in list_correct.items %}
+                                {% if key1 == key|to_int and value == value1 %}
+                                    <td class="td-std-answer" style="background-color:#90c15a !important; color: white">{{ value|join:" , " }}</td>
+                                {% elif key1 == key|to_int and value1 != value %}
+                                    <td class="td-std-answer" style="background-color:#e31212 !important; color: white">{{ value|join:" , " }}</td>
+                                {% endif %}
+                            {% endfor %}
+
                         {% endfor %}
                     {% else %}
 
@@ -76,8 +88,7 @@
                 })
 
                 $("#btn-finish-quiz").on('click', function () {
-                    let correct = JSON.parse('{{ correct|escapejs }}');
-                    let std_ans = JSON.parse('{{ std_choice|escapejs }}');
+
                     $(this).html(
                         `<div class="spinner">
                             <div class="rect1"></div>
@@ -88,6 +99,7 @@
                     </div>
                     `)
                 })
+                
             })
         </script>
     {% endif %}

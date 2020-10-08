@@ -12,11 +12,11 @@
                 {% csrf_token %}
                 <div class="row">
                     <div class="col-xl d-inline-flex p-2">
-                        <div class="p-2 position-relative">
-                            <label><i class="fas fa-pen" style="font-size: 25px"></i>
-                                <input type="text" name="quiz-title" id="quiz-title" class="quiz_title"
-                                       placeholder="Title">
-                            </label>
+                        <div class="p-2 position-relative quiz-title-area">
+                            <label for="quiz-title"><i class="fas fa-pen" style="font-size: 20px; color: #ababab"></i></label>
+                            <input type="text" name="quiz-title" id="quiz-title" class="quiz_title"
+                                   placeholder="Title" required>
+
                         </div>
                     </div>
                     <div class="col-xl p-2">
@@ -178,19 +178,20 @@
                     let quiz_json_data = [];
                     let selector_data = {};
                     let quiz_title = "";
-                    let correct = {};
+                    let correct = []
                     let explaination = "";
                     $(".qs").each(function () {
                         $(this).each(function () {
                             question_title = $(this).children('input').val();
-                            console.log(question_title)
+
                         })
                         explaination = $(this).children('div[class="explain"]').children('input[type="text"]').val()
                         $(this).children('div[class="question_wrapper"]').children('div[class="test"]').each(function () {
                             selector_data[$(this).children('label').text()] = $(this).children('input[type="text"]').val();
                         })
                         $(this).children('div[class="question_wrapper"]').children('div[class="test"]').children('input.correct-choice[type="text"]').each(function () {
-                            correct[$(this).parent('div').children('label[class="incr2"]').text()] = $(this).val();
+                            correct.push($(this).parent('div').children('label[class="incr2"]').text().trim())
+
                         })
                         let questions_data = {
                             "question_title": question_title,
@@ -201,7 +202,7 @@
                         json_data.push(questions_data);
                         selector_data = {}
                         question_title = {}
-                        correct = {}
+                        correct = []
                     })
                     quiz_title = {"quiz-title": $("#quiz-title").val()}
                     quiz_json_data.push(quiz_title)
@@ -222,7 +223,7 @@
                         error: function () {
                             alert("fail")
                         }
-                     });
+                    });
 
                     return false;
                 });

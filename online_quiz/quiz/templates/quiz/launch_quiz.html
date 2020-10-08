@@ -22,7 +22,10 @@
             <div class="step-1-content">
                 <div class="search-quizz">
                     <div class="search-div">
-                        <input type="text" onkeyup="myFunction()" id="search_input" placeholder="Search Quiz">
+                        <div class="search-container">
+                            <i id="search-icon" class="fas fa-search" aria-hidden="true"></i>
+                            <input type="text" onkeyup="myFunction()" id="search_input" placeholder="Search Quiz">
+                        </div>
                     </div>
                 </div>
                 <br>
@@ -251,6 +254,16 @@
                     }
                 })
             })
+
+             $("#search_input").focus(function () {
+            console.log("focus")
+            $(".search-container").addClass("inp-focus")
+        })
+
+        $("#search_input").focusout(function () {
+            console.log("outfocus")
+            $(".search-container").removeClass("inp-focus")
+        });
         })
     </script>
 {% endblock %}

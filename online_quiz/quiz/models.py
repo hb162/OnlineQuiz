@@ -118,6 +118,12 @@ class QuestionCopy1(models.Model):
     class Meta:
         db_table = 'questions_copy1'
 
+    def choices_data(self):
+        return json.loads(self.choices)
+
+    def title_data(self):
+        return json.loads(self.title)
+
 
 class QuizCopy2(models.Model):
     title = models.CharField(max_length=255)
@@ -174,9 +180,6 @@ class Questions(models.Model):
 
     def title_data(self):
         return json.loads(self.title)
-
-    def correct_choices_data(self):
-        return json.loads(self.correct_choices)
 
     class Meta:
         db_table = 'questions'

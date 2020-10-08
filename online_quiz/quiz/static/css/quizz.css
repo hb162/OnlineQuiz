@@ -1,14 +1,50 @@
-#search_input, #search_input_2 {
+#search_input {
+    height: 46px;
+    width: 80%;
+    border: 0;
+    line-height: 50px;
+}
+
+#search_input_2{
     height: 45px;
     width: 250px;
     border: 1px solid #8cb4d2;
 }
 
+#search_input{
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 30px;
+}
+
+#search-icon{
+    position: absolute;
+    top: 16px;
+    left: 6px;
+    color: #ababab;
+}
+
+.nav-link{
+    color: #dcdee0 !important;
+    font-size: 18px;
+}
+
+.nav-link:hover{
+    color: white !important;
+    font-size: 18px;
+}
+
+.inp-focus{
+    outline: none !important;
+    border: 2px solid #8cb4d2 !important;
+    color: #8cb4d2;
+}
 #search_input:active,
 #search_input:focus {
-    outline: none !important;
-    border: 2px solid #8cb4d2;
-    color: #8cb4d2;
+        outline: none !important;
+        border: 0;
+        color: #8cb4d2;
 }
 
 .search-quizz {
@@ -20,6 +56,21 @@
 .search-div {
     padding-top: 10px;
     padding-left: 12px;
+}
+
+.search-container{
+    height: 50px;
+    width: 30%;
+    line-height: 65px;
+    background-color: white;
+    position: relative;
+    border: 1px solid #8cb4d2;
+}
+
+@media screen and (max-width: 768px) {
+    .search-container{
+        width: 99%;
+    }
 }
 
 .all-checkbox {
@@ -35,17 +86,30 @@
     font-size: 100%;
 }
 
-.quiz_title {
+.quiz-title-area{
+    margin-top: 12px;
+    width: 60%;
     height: 50px;
-    width: 300px;
-    border-radius: 5px;
+    background-color: white !important;
     border: 1px solid #378de5;
+    border-radius: 5px;
+    position: relative;
+
+}
+
+.quiz_title {
+    top: 0;
+    position: absolute;
+    line-height: 50px;
+    height: 48px;
+    width: 90%;
+    border: 0;
     font-size: 20px;
 }
 
-.quiz_title:focus{
+.quiz_title:focus {
     outline: none;
-    border: 3px solid #6d9ec4;
+    border: 0;
 }
 
 .incr {
@@ -54,26 +118,27 @@
 }
 
 .btn-add-question {
-    box-shadow: inset -1px 0px 0px 0px #bbdaf7;
-    background: linear-gradient(to bottom, #79bbff 5%, #378de5 100%);
-    background-color: #79bbff;
-    border-radius: 11px;
-    border: 1px solid #84bbf3;
+    border: none;
+    background: #6d9ec4;
+    color: #ffffff !important;
+    font-weight: 100;
+    padding: 20px;
+    text-transform: uppercase;
+    border-radius: 6px;
     display: inline-block;
-    cursor: pointer;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 10px 34px;
-    text-decoration: none;
-    text-shadow: -1px 1px 0px #528ecc;
+    transition: all 0.3s ease 0s;
 }
 
 .btn-add-question:hover {
-    background: linear-gradient(to bottom, #378de5 5%, #79bbff 100%);
-    background-color: #378de5;
+    color: #404040 !important;
+    font-weight: 700 !important;
+    letter-spacing: 3px;
+    background: none;
+    -webkit-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+    -moz-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+    transition: all 0.3s ease 0s;
 }
+
 
 .btn-add-question:active {
     position: relative;
@@ -142,7 +207,7 @@
     width: 30px;
 }
 
-.correct-choice, .correct-choice-edit {
+.correct-choice {
     border: 2px #06b7d8 solid;
 }
 
@@ -170,6 +235,7 @@
 .faw {
     margin-left: 18px;
 }
+
 
 footer {
     position: page;
@@ -228,7 +294,7 @@ footer {
     width: 25px;
 }
 
-.trash:focus{
+.trash:focus {
     outline: none;
     border: 1px solid #6d9ec4;
     background-color: #fafafa;
@@ -367,7 +433,7 @@ footer {
     border-radius: 50px;
 }
 
-.slider{
+.slider {
     display: inline-block !important;
     width: 60px !important;
 }
@@ -392,7 +458,7 @@ footer {
     transform: translateX(26px);
 }
 
-/********************/
+/* Report Tab + Report Detail */
 
 .setting_room {
     margin-left: 30px;
@@ -413,15 +479,15 @@ footer {
 }
 
 .name_column {
-    width: 200px;
+    width: 250px;
     height: 40px;
     background-color: #eee;
     border: 2px solid #ddd;
 }
 
 .answer_column {
-    width: 65px;
-    height: 40px;
+    width: 85px;
+    height: 45px;
     text-align: center;
     background-color: #eddda6;
     border: 2px solid #e8c400;
@@ -434,6 +500,8 @@ footer {
     border-top: 0 !important;
 }
 
+
+
 .td-std-answer {
     background-color: #fff !important;
     text-align: center;
@@ -441,6 +509,18 @@ footer {
 
 #no-end, #yes-end {
     width: 100px !important;
+}
+
+/* Report Detail */
+
+.td-std-correct-ans{
+    background-color:#90c15a !important;
+    color: white
+}
+
+.td-std-wrong-ans{
+    background-color:#e31212 !important;
+    color: white
 }
 
 /*Spinner*/
@@ -631,20 +711,136 @@ footer {
     border: 2px solid #6d9ec4;
 }
 
+.lbl-checkall {
+    white-space: nowrap;
+    max-width: 150px;
+    margin-top: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    float: left;
+}
+
+#checkall-rp {
+    height: 20px;
+    margin-left: 7px;
+    margin-top: 21px;
+}
+
 /*Question detail*/
-.qs-title-edit{
-    /*width: 350px;*/
+.qs-title-edit {
+    width: 84%;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.qs-lbl-title {
+    width: 4% !important;
+}
+
+.qs-label-edit {
+    width: 2%;
+}
+
+.qs-ans{
+    margin-bottom: 20px;
+}
+
+.qs-explain-edit {
+    width: 90%;
+}
+
+.qs-choices-edit {
+    width: 84%;
     display: inline-block;
 }
 
-.qs-label-edit{
-    width: 88%;
-}
-
-#qs-listanswer-edit{
+#qs-listanswer-edit {
     display: block;
 }
 
-.qs-choices-edit{
+.qs-add-answer-edit {
+    border-radius: 4px;
+    background: linear-gradient(to right, #06b7d8 , #1764ff) !important;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 14px;
+    padding: 11px;
+    width: 150px;
+    transition: all 0.4s;
+    cursor: pointer;
+    margin: 5px;
+    margin-left: 0 !important;
+}
+
+.qs-add-answer-edit span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.4s;
+}
+
+.qs-add-answer-edit span:after {
+    content: '\002B';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+}
+
+.qs-add-answer-edit:hover span {
+    padding-right: 25px;
+}
+
+.qs-add-answer-edit:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+.qs-add-answer-edit:focus {
+    outline: none;
+    background: linear-gradient(to right, #266eff, #2565e6) !important;
+    border: 0;
+}
+
+/*Change Password Form*/
+
+.bound-change-pass{
+    position: relative;
+}
+
+#form-change-pass{
+    background-color: #f1f1f1;
+    border-radius: 6px;
+    position: absolute;
+    top: 90px;
+    left: 200px;
+    right: 200px;
+}
+
+#form-change-pass h1{
+    text-align: center;
+}
+
+#change-pass-tbl{
+    text-align: center;
+    margin: 10px auto;
+    border-spacing: 5px 10px;
+    border-collapse: separate;
 
 }
+
+#btn-div{
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.tr-change-pass{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Report Detail */
+

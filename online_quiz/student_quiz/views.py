@@ -24,6 +24,7 @@ def sign_in_with_name(request):
                 # return render(request, 'student_quiz/student_name.html', {'room_name': room_name})
             ResultDetail.objects.create(student_name=std_name, result_id=rst.id)
             request.session['student_name'] = std_name
+            request.session['result_id'] = rst.id
             return redirect('quiz_test')
         else:
             return render(request, 'student_quiz/student_name.html', {'room_name': room_name})
@@ -44,6 +45,7 @@ def student_sign_in(request):
                     rst = ResultsTest.objects.get(room_id=room.id, room__status=1, status=1)
                     ResultDetail.objects.create(student_name=student_name, result_id=rst.id)
                     request.session['student_name'] = student_name
+                    request.session['result_id'] = rst.id
                     request.session.set_expiry(0)
                     return redirect('quiz_test')
                 else:
@@ -91,11 +93,12 @@ def student_quiz_test(request):
 def student_answer(request):
     if request.session.has_key('student_name'):
         std_name = request.session['student_name']
+        rs_id = request.session['result_id']
         if request.method == "POST":
             score = request.POST['score']
             dict_student_ans = json.loads(request.POST["student_answer_data"])
             try:
-                std = ResultDetail.objects.get(student_name=std_name)
+                std = ResultDetail.objects.get(student_name=std_name, result_id=rs_id)
                 std.scores = score
                 std.student_choice = json.dumps(dict_student_ans, ensure_ascii=False)
                 std.save()

@@ -38,12 +38,17 @@
                 {% endfor %}
             </div>
             <div class="state-change">
-                <button type="button" class="state-change-btn btn" id="delete-report" disabled><i class="fa fa-trash" aria-hidden="true"></i> DELETE
-                </button>
+                <button type="button" class="state-change-btn btn" id="delete-report" disabled><i class="fa fa-trash" aria-hidden="true"></i> DELETE </button>
+                <div style="display: inline-block">
+                    <input type="checkbox" class="state-change-btn btn" id="checkall-rp"
+                       onchange="checkAll(this)">
+                    <label class="lbl-checkall" for="checkall-rp">ALL</label>
+
+                </div>
             </div>
-            <table class="rp-table" align="center">
+            <table class="rp-table" id="report-table" align="center">
                 <tr>
-                    <th class="rp-all-col">All</th>
+                    <th class="rp-all-col">ALL</th>
                     <th class="rp-name-col">NAME</th>
                     <th class="rp-date-col">DATE</th>
                     <th class="rp-room-col">ROOM</th>
@@ -51,8 +56,8 @@
                 <tbody>
                 {% if result.count > 0 %}
                     {% for i in result %}
-                        <tr>
-                            <td><input type="checkbox" class="checkbox-delete" data-id="{{ i.id }}"></td>
+                        <tr data-id="{{ i.id }}">
+                            <td><input type="checkbox" class="checkbox-delete" name="check"></td>
                             <td><a href="{% url 'report_detail' i.pk %}"><u>{{ i.quiz }}</u></a></td>
                             <td>{{ i.date| date:'d/m/Y H:i' }}</td>
                             <td>{{ i.room }}</td>
@@ -60,8 +65,8 @@
                     {% endfor %}
                 {% else %}
                     {% for rs in result_test %}
-                        <tr>
-                            <td><input type="checkbox" class="checkbox-delete" data-id="{{ rs.id }}"></td>
+                        <tr data-id="{{ rs.id }}">
+                            <td><input type="checkbox" name="check" class="checkbox-delete" data-id="{{ rs.id }}"></td>
                             <td><a href="{% url 'report_detail' rs.pk %}"><u>{% firstof rs.quiz1 rs.quiz2 %}</u></a></td>
                             <td>{{ rs.date| date:'d/m/Y H:i' }}</td>
                             <td>{{ rs.room }}</td>
@@ -72,16 +77,55 @@
             </table>
         </form>
         <script>
+            function checkAll(e) {
+                var checkboxes = document.getElementsByName('check');
+
+                if (e.checked) {
+                    for (let i = 0; i < checkboxes.length; i++) {
+                        checkboxes[i].checked = true;
+                    }
+                } else {
+                    for (let i = 0; i < checkboxes.length; i++) {
+                        checkboxes[i].checked = false;
+                    }
+                }
+            }
+
             $(document).ready(function () {
                 $(document).on('click', '.checkbox-delete', function () {
-                    if ($(".rp-table input[type=checkbox]").is(":checked")){
+                    if ($(".rp-table input[type=checkbox]").is(":checked")) {
                         $("#delete-report").attr("disabled", false)
-                    }else{
+                    } else {
                         $("#delete-report").attr("disabled", true)
                     }
                     let id = $(this).data('id')
                     console.log(id)
                 })
+                $("#delete-report").on('click', function () {
+                    let selected_report = [];
+
+                    $('#report-table').find('tr').each(function () {
+                        let row = $(this);
+                        if (row.find('input[type="checkbox"]').is(':checked')) {
+                            selected_report.push(row.attr('data-id'))
+                        }
+                    });
+                    selected_report = JSON.stringify(selected_report);
+                    $.ajax({
+                        url: "{% url 'delete_report' %}",
+                        type: 'POST',
+                        data: {'selected_report': selected_report},
+                        success: function (response) {
+                            if (response['error'] === false) {
+                                alert(response['error_message']);
+                                location.reload();
+                            } else {
+                                alert(response['error_message']);
+                            }
+                        }
+                    })
+                })
+
             })
         </script>
     {% endif %}

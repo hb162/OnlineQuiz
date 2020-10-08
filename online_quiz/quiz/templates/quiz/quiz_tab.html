@@ -22,9 +22,10 @@
         {#search input#}
         <div class="search-quizz">
             <div class="search-div">
-                <i id="search-icon" class="fas fa-search" aria-hidden="true"></i>
-
-                <input type="text" onkeyup="myFunction()" id="search_input" placeholder="Search Quiz">
+                <div class="search-container">
+                    <i id="search-icon" class="fas fa-search" aria-hidden="true"></i>
+                    <input type="text" onkeyup="myFunction()" id="search_input" placeholder="Search Quiz">
+                </div>
             </div>
         </div>
         <br>
@@ -80,8 +81,7 @@
                 }
             }
         }
-    </script>
-    <script>
+
         function myFunction() {
             var input, filter, table, tr, td, i, txtValue;
             input = document.getElementById("search_input");
@@ -101,6 +101,16 @@
                 }
             }
         }
+
+        $("#search_input").focus(function () {
+            console.log("focus")
+            $(".search-container").addClass("inp-focus")
+        })
+
+        $("#search_input").focusout(function () {
+            console.log("outfocus")
+            $(".search-container").removeClass("inp-focus")
+        });
 
         $(document).ready(function () {
             $(document).on('click', '.checkbox-quiz', function () {
@@ -128,13 +138,14 @@
                 type: 'POST',
                 data: {'selected_quiz': selected_quiz},
                 success: function (response) {
-                    if(response['error'] === false){
+                    if (response['error'] === false) {
                         alert(response['error_message']);
-                    }else{
+                        location.reload();
+                    } else {
                         alert(response['error_message']);
                     }
                 }
-             })
+            })
         })
     </script>
 

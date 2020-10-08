@@ -1,8 +1,53 @@
 {% extends 'quiz/index.html' %}
 {% load static %}
+{% load quiz_result_extras %}
 {% block content %}
-    {% for i in result_detail %}
-        <p>{{ i.student_name }}</p>
-    {% endfor %}
+    {% if user.is_authenticated %}
+        <div class="row">
+            <div class="col-sm d-inline-flex p-2">
+                <div class="p-2 position-relative"><span style="font-size: 30px">{% firstof rs.quiz1.title rs.quiz2.title %} - {{ rs.date }}</span></div>
+            </div>
+
+        </div>
+        <hr>
+        <table id="result_table" align="left" border="1px;">
+                <tr class="tr-result">
+                    <th class="name_column">
+                        <span id="span-column-name">Name</span>
+                        <span id="span-column-score" style="float:right">Score</span>
+                    </th>
+                    {% with ''|center:q.total_question as range %}
+                        {% for i in range %}
+                            <th class="answer_column">
+                                <a href="">{{ forloop.counter }}</a>
+                            </th>
+                        {% endfor %}
+                    {% endwith %}
+                </tr>
+            <tbody>
+            {% for j in rs_detail %}
+                <tr class="tr-result">
+                    {% if j.student_choice|length > 0 %}
+                        <td class="td-std-name">
+                            <span>{{ j.student_name }}</span>
+                            <span style="float:right">{{ j.scores|as_percentage_of:q.total_question }}</span>
+                        </td>
+                        {% for key, value in j.student_choice_data.items %}
+                            {% for key1, value1 in list_correct.items %}
+                                {% if key1 == key|to_int and value == value1 %}
+                                    <td class="td-std-answer td-std-correct-ans">{{ value|join:" , " }}</td>
+                                {% elif key1 == key|to_int and value1 != value %}
+                                    <td class="td-std-answer td-std-wrong-ans">{{ value|join:" , " }}</td>
+                                {% endif %}
+                            {% endfor %}
+
+                        {% endfor %}
+                    {% else %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 
 {% endblock %}

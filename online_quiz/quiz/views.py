@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .utils import PasswordResetTokenGenerator
 from .models import *
 from django.contrib.auth.hashers import check_password, make_password
-from .forms import AuthenticationForm, UserCreationForm, RegistrationForm, RequestForgetPassword, ResetNewPassword
+from .forms import AuthenticationForm, UserCreationForm, RegistrationForm, RequestForgetPassword, ResetNewPassword, ChangePasswordForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text, DjangoUnicodeDecodeError
@@ -193,7 +193,18 @@ class SetNewPassordView(View):
 
 
 def change_password(request):
-    pass
+    if request.method == "POST":
+        form = ChangePasswordForm(request.user, request.POST)
+        if form.is_valid():
+            old_password = form.cleaned_data['old_password']
+            password1 = form.cleaned_data['password1']
+            password2 = form.cleaned_data['password2']
+            return HttpResponse("SUCCESS")
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = ChangePasswordForm(request.user)
+        return render(request, 'quiz/change_password.html', {'form': form})
 
 
 def quizz_tab(request):
@@ -210,60 +221,6 @@ def quizz_tab(request):
     except(ValueError, AttributeError):
         return HttpResponse("sai")
     return render(request, "quiz/quiz_tab.html", context=ctx)
-
-
-def quiz_detail(request, pk):
-    if request.method == "GET":
-        quiz = Quiz.objects.filter(id=pk)
-        questions = Questions.objects.filter(quiz_id=pk)
-        context = {'quiz': quiz, 'questions': questions}
-        return render(request, 'quiz/quiz_detail.html', context)
-    else:
-        if request.method == "POST":
-            question_data = json.loads(request.POST['question_data'])
-            quiz_data = json.loads(request.POST['quiz_data'])
-            q = Quiz.objects.get(id=pk)
-            try:
-                for i in quiz_data:
-                    q.title = i['quiz-title']
-                    q.save()
-                for i in question_data:
-                    question_title = i['question_title']
-                    answers = json.dumps(i['answers'], ensure_ascii=False)
-                    correct = json.dumps(i['correct'], ensure_ascii=False)
-                    explain = i['exp']
-                    Questions.objects.create(title=question_title, choices=answers, correct_choices=correct, explain=explain, quiz_id=pk)
-                    quiz_data = {"error": False, "error_message": "Quiz has been updated."}
-                    return JsonResponse(quiz_data)
-            except(ValueError, AttributeError, ConnectionAbortedError, TimeoutError):
-                quiz_data = {"error": True, "error_message": "Something went wrong!."}
-                return JsonResponse(quiz_data)
-            return HttpResponse("gg")
-
-
-@csrf_exempt
-def question_detail(request, pk):
-    if request.method == "GET":
-        question_id = request.GET['question_id']
-        q_detail = Questions.objects.filter(id=question_id)
-        return render(request, 'quiz/quiz_detail.html', {'q_detail': q_detail})
-    elif request.method == "POST":
-        q = Questions.objects.get(id=pk)
-        json_data = json.loads(request.POST['json_data'])
-        try:
-            for i in json_data:
-                question_title = i['question_title']
-                answers = json.dumps(i['answer_data'], ensure_ascii=False)
-                correct = json.dumps(i['correct'], ensure_ascii=False)
-                explain = i['exp']
-                q.title = question_title
-                q.choices = answers
-                q.correct_choices = correct
-                q.explain = explain
-                q.save()
-        except(ValueError, AttributeError, ConnectionError, ObjectDoesNotExist):
-            return HttpResponse("Wrong")
-        return HttpResponse("Good")
 
 
 @csrf_exempt
@@ -300,6 +257,60 @@ def add_quiz(request):
     return render(request, 'quiz/add_quiz.html')
 
 
+def quiz_detail(request, pk):
+    if request.method == "GET":
+        quiz = Quiz.objects.filter(id=pk)
+        questions = Questions.objects.filter(quiz_id=pk)
+        context = {'quiz': quiz, 'questions': questions}
+        return render(request, 'quiz/quiz_detail.html', context)
+    else:
+        if request.method == "POST":
+            question_data = json.loads(request.POST['question_data'])
+            quiz_data = json.loads(request.POST['quiz_data'])
+            q = Quiz.objects.get(id=pk)
+            try:
+                for i in quiz_data:
+                    q.title = i['quiz-title']
+                    q.save()
+                for i in question_data:
+                    question_title = i['question_title']
+                    answers = json.dumps(i['selector'], ensure_ascii=False)
+                    correct = i['correct']
+                    explain = i['exp']
+                    Questions.objects.create(title=question_title, choices=answers, correct_choices=correct, explain=explain, quiz_id=pk)
+                    quiz_data = {"error": False, "error_message": "Quiz has been updated."}
+                    return JsonResponse(quiz_data)
+            except(ValueError, AttributeError, ConnectionAbortedError, TimeoutError):
+                quiz_data = {"error": True, "error_message": "Something went wrong!."}
+                return JsonResponse(quiz_data)
+            return HttpResponse("gg")
+
+
+@csrf_exempt
+def question_detail(request, pk):
+    if request.method == "GET":
+        question_id = request.GET['question_id']
+        q_detail = Questions.objects.filter(id=question_id)
+        return render(request, 'quiz/quiz_detail.html', {'q_detail': q_detail})
+    elif request.method == "POST":
+        q = Questions.objects.get(id=pk)
+        json_data = json.loads(request.POST['json_data'])
+        try:
+            for i in json_data:
+                question_title = i['question_title']
+                answers = json.dumps(i['answer_data'], ensure_ascii=False)
+                correct = json.dumps(i['correct'], ensure_ascii=False)
+                explain = i['exp']
+                q.title = question_title
+                q.choices = answers
+                q.correct_choices = correct
+                q.explain = explain
+                q.save()
+        except(ValueError, AttributeError, ConnectionError, ObjectDoesNotExist):
+            return HttpResponse("Wrong")
+        return HttpResponse("Good")
+
+
 def delete_quiz(request):
     error_data = {}
     if request.is_ajax():
@@ -309,11 +320,11 @@ def delete_quiz(request):
                 if quiz != '':
                     quiz_del = Quiz.objects.filter(id=quiz).delete()
                     error_data = {'error': False, 'error_message': 'Quiz has been deleted.'}
-                return HttpResponse(error_data)
+                return JsonResponse(error_data)
         except(AttributeError, ValueError, ConnectionAbortedError):
             error_data = {'error': True, 'error_message': 'Id not found'}
             return HttpResponse(error_data)
-    return HttpResponse("abc")
+    return JsonResponse("abc")
 
 
 @csrf_exempt
@@ -435,6 +446,7 @@ def launch_quizz(request):
 def quiz_result(request):
     std_choice = ""
     result_detail = ""
+    questions = ""
     q_correct = []
     list_correct = {}
     q = ""
@@ -443,27 +455,21 @@ def quiz_result(request):
             rs = ResultsTest.objects.get(teacher_id=request.user.id, room__status=1, status=1)
             if rs.quiz1:
                 q = QuizCopy1.objects.get(id=rs.quiz1.id, teacher_id=request.user.id)
+                questions = QuestionCopy1.objects.filter(quiz1_id=q.id)
             elif rs.quiz2:
                 q = QuizCopy2.objects.get(title=rs.quiz2.id, teacher_id=request.user.id)
-            questions = Questions.objects.filter(quiz_id=q.id)
+                questions = QuestionCopy1.objects.filter(quiz1_id=q.id)
             for i in questions:
-                q_correct.append(i.correct_choices)
-            for k, v in enumerate(q_correct):
+                i = json.loads(i.correct_choices)
+                q_correct.append(i)
+            for k, v in enumerate(q_correct, start=1):
                 list_correct[k] = v
-            list_correct = json.dumps(list_correct)
+            # list_correct = json.dumps(list_correct)
             result_detail = ResultDetail.objects.filter(result_id=rs.id)
-            if result_detail is not None:
-                for j in result_detail:
-                    if not j.student_choice:
-                        print("None")
-                    else:
-                        std_choice = json.dumps(j.student_choice_data)
-                context = {'result_test': rs, 'rs_detail': result_detail,
-                           'std_choice': std_choice,
-                           'q': q, 'correct': list_correct}
-                return render(request, 'quiz/quiz_result_single_room.html', context)
-            else:
-                return render(request, 'quiz/quiz_result_single_room.html', {'result_test': rs, 'q': q})
+            context = {'result_test': rs, 'rs_detail': result_detail,
+                       'std_choice': std_choice,
+                       'q': q, 'question': questions, 'list_correct': list_correct}
+            return render(request, 'quiz/quiz_result_single_room.html', context)
         except ResultsTest.DoesNotExist:
             rs = None
             return HttpResponse('<h1>NONE OF QUIZ IS RUNNING NOW! CLICK BACK BUTTON TO BACK TO MAIN MENU</h1>')
@@ -505,11 +511,52 @@ def report_tab(request):
 
 
 def delete_report(request):
-
-    return HttpResponse("Success")
+    rp_data = {}
+    if request.is_ajax():
+        list_id = json.loads(request.POST['selected_report'])
+        try:
+            for i, report in enumerate(list_id):
+                if report != '':
+                    rp_del = ResultsTest.objects.filter(id=report).delete()
+                    rp_data = {'error': False, 'error_message': 'Report has been deleted.'}
+                return JsonResponse(rp_data)
+        except(AttributeError, ValueError, ConnectionAbortedError):
+            rp_data = {'error': True, 'error_message': 'Id not found'}
+            return HttpResponse(rp_data)
+    return JsonResponse("abc")
 
 
 def report_detail(request, pk):
+    result = ResultsTest.objects.get(id=pk)
     result_detail = ResultDetail.objects.filter(result_id=pk)
-    context = {'result_detail': result_detail}
+    std_choice = ""
+    result_detail = ""
+    questions = ""
+    q_correct = []
+    list_correct = {}
+    q = ""
+    if request.method == "GET":
+        try:
+            rs = ResultsTest.objects.get(id=pk, status=0)
+            if rs.quiz1:
+                q = QuizCopy1.objects.get(id=rs.quiz1.id, teacher_id=request.user.id)
+                questions = QuestionCopy1.objects.filter(quiz1_id=q.id)
+            elif rs.quiz2:
+                q = QuizCopy2.objects.get(title=rs.quiz2.id, teacher_id=request.user.id)
+                questions = QuestionCopy1.objects.filter(quiz1_id=q.id)
+            for i in questions:
+                i = json.loads(i.correct_choices)
+                q_correct.append(i)
+            for k, v in enumerate(q_correct, start=1):
+                list_correct[k] = v
+            result_detail = ResultDetail.objects.filter(result_id=rs.id)
+
+            context = {'rs': rs, 'rs_detail': result_detail,
+                       'std_choice': std_choice,
+                       'q': q, 'question': questions, 'list_correct': list_correct}
+            return render(request, 'quiz/report_detail.html', context)
+
+        except ResultsTest.DoesNotExist:
+            pass
+    context = {'rs_detail': result_detail, 'rs': result}
     return render(request, 'quiz/report_detail.html', context)
