@@ -48,7 +48,7 @@
 }
 
 .search-quizz {
-    height: 65px;
+    height: 70px;
     width: 100%;
     background-color: #f0f0f0;
 }
@@ -65,12 +65,6 @@
     background-color: white;
     position: relative;
     border: 1px solid #8cb4d2;
-}
-
-@media screen and (max-width: 768px) {
-    .search-container{
-        width: 99%;
-    }
 }
 
 .all-checkbox {
@@ -584,12 +578,16 @@ footer {
 
 /*Report Tab*/
 @media screen and (max-width: 768px) {
+    .search-container{
+        width: 98%;
+    }
+
     .rp-search-bar {
         height: 135px !important;
     }
 
-    #rp-search-input {
-        width: 80%;
+    .rp-search-div {
+        width: 100% !important;
     }
 
     .rp-filter-div {
@@ -603,12 +601,12 @@ footer {
         width: 93% !important;
     }
 
-    #rp-btn-search {
-        margin-top: 0 !important;
-        min-width: 70px !important;
-        position: inherit !important;
-        right: auto !important;
-    }
+    /*#rp-btn-search {*/
+    /*    margin-top: 0 !important;*/
+    /*    min-width: 70px !important;*/
+    /*    position: inherit !important;*/
+    /*    right: auto !important;*/
+    /*}*/
 
 }
 
@@ -626,33 +624,48 @@ footer {
 
 .rp-search-container {
     padding: 11px;
-    position: relative;
+    /*position: relative;*/
 }
 
 .rp-search-div {
-    border: 1px solid transparent;
+    background-color: white;
+    border: 1px solid #ababab;
+    border-right: 0;
     position: relative;
+    height: 45px;
+    width: 31%;
+}
+
+.fa-rp-search{
+    position: absolute;
+    top: 15px;
+    left: 16px;
+    color: #ababab;
 }
 
 #rp-search-input {
-    height: 44px;
+    height: 43px;
+    width: 65%;
+    line-height: 45px;
     max-width: 100%;
     padding: 0 14px;
-    border: 1px solid #bbb;
+    border: 0;
     background: #fff;
     color: #333;
+    position: absolute;
+    top: 0;
+    left: 32px;
 }
 
 #rp-btn-search {
-    height: 44px !important;
-    margin-bottom: 5px !important;
-    margin-top: 0;
-    min-width: 70px;
-    position: inherit;
-    right: auto;
-    background-color: #6d9ec4 !important;
-    border-color: #6d9ec4 !important;
-
+    position: absolute;
+    top: -1px;
+    background-color: #5e94be;
+    right: 0;
+    border: 0;
+    color: white;
+    width: 26%;
+    height:103%;
 }
 
 #div-btn-search {
@@ -708,7 +721,7 @@ footer {
 
 #rp-search-input:focus {
     outline: none !important;
-    border: 2px solid #6d9ec4;
+    border: 0;
 }
 
 .lbl-checkall {
@@ -843,4 +856,6 @@ footer {
 }
 
 /* Report Detail */
-
+#span-column-score{
+    float: right;
+}

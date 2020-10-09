@@ -16,10 +16,9 @@
             <div class="rp-search-bar">
                 <div class="rp-search-container">
                     <div class="rp-search-div">
+                        <i class="fa fa-search fa-rp-search" aria-hidden="true"></i>
                         <input type="text" name="rp_search" maxlength="255" id="rp-search-input" placeholder="Search">
-                        <div id="div-btn-search">
-                            <button type="submit" class="btn btn-primary" id="rp-btn-search">Search</button>
-                        </div>
+                            <button type="submit" id="rp-btn-search">Search</button>
                     </div>
                     <div class="rp-filter-div">
                         <div class="select-container">
@@ -33,7 +32,7 @@
                 </div>
             </div>
             <div class="rp-search-noti">
-                {% for m in messages %}
+                {% for m in message %}
                     <span>{{ m }}</span>
                 {% endfor %}
             </div>
@@ -58,7 +57,7 @@
                     {% for i in result %}
                         <tr data-id="{{ i.id }}">
                             <td><input type="checkbox" class="checkbox-delete" name="check"></td>
-                            <td><a href="{% url 'report_detail' i.pk %}"><u>{{ i.quiz }}</u></a></td>
+                            <td><a href="{% url 'report_detail' i.pk %}"><u>{% firstof i.quiz1 i.quiz2 %}</u></a></td>
                             <td>{{ i.date| date:'d/m/Y H:i' }}</td>
                             <td>{{ i.room }}</td>
                         </tr>

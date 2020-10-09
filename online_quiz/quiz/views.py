@@ -499,15 +499,14 @@ def report_tab(request):
     else:
         room_select = request.POST['room_select']
         rp_search = request.POST['rp_search']
-        q = Quiz.objects.filter(title__contains=rp_search).first()
-        result_filter = ResultsTest.objects.filter(teacher_id=request.user.id, room__name=room_select,
-                                                   quiz__title=q)
+        q = QuizCopy1.objects.filter(title__contains=rp_search).first()
+        result_filter = ResultsTest.objects.filter(Q(quiz1__title=q) | Q(quiz2__title=q), teacher_id=request.user.id, room__name=room_select)
         if result_filter:
             context = {'rooms': rooms, 'result': result_filter}
             return render(request, 'quiz/report.html', context)
         else:
-            messages.add_message(request, messages.ERROR, 'Search Not Found!')
-            return render(request, 'quiz/report.html', {'rooms': rooms})
+            message = "Search Not Found!"
+            return render(request, 'quiz/report.html', {'rooms': rooms, 'message': message})
 
 
 def delete_report(request):

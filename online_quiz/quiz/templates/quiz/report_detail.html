@@ -19,7 +19,7 @@
                     {% with ''|center:q.total_question as range %}
                         {% for i in range %}
                             <th class="answer_column">
-                                <a href="">{{ forloop.counter }}</a>
+                                <a href="{{ j.id }}">{{ forloop.counter }}</a>
                             </th>
                         {% endfor %}
                     {% endwith %}
@@ -30,7 +30,7 @@
                     {% if j.student_choice|length > 0 %}
                         <td class="td-std-name">
                             <span>{{ j.student_name }}</span>
-                            <span style="float:right">{{ j.scores|as_percentage_of:q.total_question }}</span>
+                            <span class="display-score" style="float:right">{{ j.scores|as_percentage_of:q.total_question }}</span>
                         </td>
                         {% for key, value in j.student_choice_data.items %}
                             {% for key1, value1 in list_correct.items %}
@@ -49,5 +49,8 @@
             </tbody>
         </table>
     {% endif %}
-
+    <script>
+        $(document).ready(function () {
+        })
+    </script>
 {% endblock %}
