@@ -35,7 +35,7 @@
 
                 {#form question#}
                 <div class="bound">
-                    <div class="form_question" id="form_question">
+
                         {% for i in questions %}
                             <div class="qtn-form" id="{{ i.id }} ">
                                 <div class="row qs_title_save_db">
@@ -45,7 +45,7 @@
                                         <button data-id="{{ i.id }}" data-toggle="modal" data-href="{% url 'question_detail' i.id %}" type="button" class="edit_question"><i
                                                 class="fas fa-pencil-alt s"></i></button>
                                         <button type="button" class="delete_question"><img
-                                                src="{% static 'image/trash.png' %}" class="trash"></button>
+                                                src="{% static 'image/trash.png' %}" height="" class="trash"></button>
                                     </div>
                                 </div>
                                 <div class="qs_save_db">
@@ -73,6 +73,7 @@
                             </div>
 
                         {% endfor %}
+                    <div class="form_question" id="form_question">
                     </div>
                     <div class="text-center"><h2>Add a question</h2></div>
                     <div class="text-center">

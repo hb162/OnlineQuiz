@@ -68,12 +68,15 @@
         const questionNav = document.getElementById("question_nav");
         let scores = 0;
 
+        function shuffle(array) {
+            array.sort(() => Math.random() - 0.5);
+        }
+
         function buildQuiz() {
             const output = [];
             myQuestions.forEach(
                 (currentQuestion, questionNumber) => {
-                    title = [];
-                    const num = [];
+                    let title = [];
                     title.push(
                         `<div class="num row justify-content-center"><h2>${questionNumber + 1} of ${myQuestions.length}</h2></div>
                             <div class="row justify-content-center">
@@ -96,7 +99,7 @@
                         `
                         <div class="slide" id="question${questionNumber + 1}">
                             <div class="question">${title.join('')}</div>
-                            <div class="answers">${answer.join('')}</div>
+                            <div class="answers" data-id=${currentQuestion.id}>${answer.join('')}</div>
                         </div>`
                     );
                 }
@@ -304,16 +307,16 @@
             e.preventDefault();
             let answers = [];
             let student_answers = {};
-            let i = 1;
             $(".slide").each(function () {
+                let ans_id = $(this).children(".answers").data("id")
                 $(this).children('.answers').children().children().children('input:checked').each(function () {
                     answers.push($(this).val());
                 })
-                student_answers[i] = answers;
-                i += 1;
+                student_answers[ans_id] = answers;
                 answers = [];
             })
             let json_data = JSON.stringify(student_answers);
+            console.log(json_data)
             $.ajax({
                 type: "POST",
                 url: '{% url 'finish_quiz' %}',
@@ -321,25 +324,24 @@
                     score: scores,
                     student_answer_data: json_data
                 },
-                success: function(){
+                success: function () {
                 },
                 error: function () {
                     alert("fail")
                 }
-            });
+             });
         })
 
         $(document).on('click', '#next_quiz', function (e) {
             e.preventDefault();
             let answers = [];
             let student_answers = {};
-            let i = 1;
             $(".slide").each(function () {
+                let ans_id = $(this).children(".answers").data("id")
                 $(this).children('.answers').children().children().children('input:checked').each(function () {
                     answers.push($(this).val());
                 })
-                student_answers[i] = answers;
-                i += 1;
+                student_answers[ans_id] = answers;
                 answers = [];
             })
             let json_data = JSON.stringify(student_answers);
@@ -350,13 +352,14 @@
                     score: scores,
                     student_answer_data: json_data
                 },
-                success: function(){
+                success: function () {
                 },
                 error: function () {
                     alert("fail")
                 }
-            });
+             });
         })
+
 
     </script>
 

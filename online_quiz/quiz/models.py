@@ -128,12 +128,36 @@ class QuestionCopy1(models.Model):
 class QuizCopy2(models.Model):
     title = models.CharField(max_length=255)
     date = models.DateTimeField(default=datetime.datetime.now())
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.title
 
+    @property
+    def total_question(self):
+        questions = self.questioncopy2_set.all()
+        total = questions.count()
+        return total
+
     class Meta:
         db_table = 'quiz_copy2'
+
+
+class QuestionCopy2(models.Model):
+    quiz2 = models.ForeignKey(QuizCopy2, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    explain = models.TextField(null=True, blank=True)
+    choices = models.TextField()
+    correct_choices = models.TextField()
+
+    class Meta:
+        db_table = 'questions_copy2'
+
+    def choices_data(self):
+        return json.loads(self.choices)
+
+    def title_data(self):
+        return json.loads(self.title)
 
 
 class Room(models.Model):

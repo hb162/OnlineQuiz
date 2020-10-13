@@ -78,12 +78,11 @@ addQtnBtn.addEventListener("click", () => {
                                 <div class="question_wrapper" id="all_answer"></div>
                                 <button class="add_selector" type="button">&#43;Add Answer</button>
                                 <div class="explain">
+                                    <div class="label_explain"><i class="fas fa-exclamation"></i></div>
                                     <input type="text" class="question_explain" id="exp"
                                            placeholder="An explaination, if you like">
-                                    <label for="exp" class="label_explain"><i class="fas fa-exclamation"></i></label>
                                 </div>
                             </div>
-                            <div class="end-question"></div>
                         </div>
         `;
     qtnForm.innerHTML = qtnFormContent;

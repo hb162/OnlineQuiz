@@ -66,22 +66,25 @@ def student_quiz_test(request):
         std_name = request.session['student_name']
         room = Room.objects.get(name=room_name)
         questions = ""
-        if room.is_shuffle == 1:
+        if room.is_shuffle == "1":
             quiz = QuizCopy2.objects.get(id=room.quiz2_id)
+            questions = quiz.questioncopy2_set.all()
         else:
             quiz = QuizCopy1.objects.get(id=room.quiz1_id)
             questions = quiz.questioncopy1_set.all()
         questions_detail = []
         q = dict()
         for i in questions:
+            q['id'] = i.id
             q['question_title'] = i.title
             q['choices'] = json.loads(i.choices)
             q['correct'] = json.loads(i.correct_choices)
             questions_detail.append(q)
             q = dict()
+        random.shuffle(questions_detail)
         questions_detail = json.dumps(questions_detail)
-
         context = {
+            'room': room,
             'room_name': room_name,
             'quiz': quiz,
             'detail': questions_detail
