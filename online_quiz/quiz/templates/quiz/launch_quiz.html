@@ -87,16 +87,23 @@
                     <div class="col-xl-3 vl">
                         <div class="row setting_room">
                             <label class="toggle" for="required_name">
-                                <input type="checkbox" id="required_name">
+                                <input type="checkbox" class="checkbox-setting" id="required_name">
                                 <div class="slider"></div>
                                 Required Name
                             </label>
                         </div>
                         <div class="row setting_room">
                             <label class="toggle" for="shuffle_question">
-                                <input type="checkbox" id="shuffle_question">
+                                <input type="checkbox" class="checkbox-setting" id="shuffle_question">
                                 <div class="slider"></div>
                                 Shuffle Question
+                            </label>
+                        </div>
+                        <div class="row setting_room">
+                            <label class="toggle" for="shuffle_answers">
+                                <input type="checkbox" class="checkbox-setting" id="shuffle_answers">
+                                <div class="slider"></div>
+                                Shuffle Answers
                             </label>
                         </div>
                     </div>
@@ -163,6 +170,7 @@
             let quiz_title = "";
             let name_room = "";
             let req_name = "No";
+            let shuffle_ans = "No";
             let shuffle_question = "No";
             $(document).on('change', '.radio_launch', function () {
                 if ($(this).prop('checked', true)) {
@@ -224,6 +232,14 @@
                 }
             })
 
+            $(document).on('click', '#shuffle_answers', function () {
+                if ($(this).prop('checked') === false) {
+                    shuffle_ans = 'No'
+                } else {
+                    shuffle_ans = 'Yes'
+                }
+            })
+
 
             $("#shuffle_question").on('click', function () {
                 if ($(this).prop('checked') === false) {
@@ -241,6 +257,7 @@
                     type: "POST",
                     url: '{% url 'launch_quiz' %}',
                     data: {
+                        shuffle_answers: shuffle_ans,
                         req_name: req_name,
                         is_shuffle: shuffle_question,
                         quiz: quiz_title,

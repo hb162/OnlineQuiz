@@ -181,6 +181,7 @@ class Room(models.Model):
     status = models.CharField(choices=STATUS, default=0, max_length=1)
     required_name = models.CharField(default=0, choices=REQUIRED_NAME, max_length=1)
     is_shuffle = models.CharField(default=0, choices=SHUFFLE, max_length=1)
+    shuffle_answers = models.CharField(default=0, choices=SHUFFLE, max_length=1)
 
     def __str__(self):
         return self.name

@@ -68,10 +68,6 @@
         const questionNav = document.getElementById("question_nav");
         let scores = 0;
 
-        function shuffle(array) {
-            array.sort(() => Math.random() - 0.5);
-        }
-
         function buildQuiz() {
             const output = [];
             myQuestions.forEach(
@@ -86,14 +82,18 @@
                             </div>`
                     )
                     const answer = [];
+                    let current = 1;
+
                     for (let letter in currentQuestion.choices) {
+                        let char = String.fromCharCode(64 + current)
                         answer.push(
                             `<div class="row" style="display: block;"><label>
                         <input type="checkbox" class="checkbox-round" name="question${questionNumber}" value="${letter}">
-                        <span class="answer">${letter} :
+                        <span class="answer" id=${letter}>${char} :
                         ${currentQuestion.choices[letter]}</span>
                       </label></div>`
                         );
+                        current++;
                     }
                     output.push(
                         `
@@ -105,6 +105,10 @@
                 }
             );
             quizContainer.innerHTML = output.join('');
+        }
+
+        const nextChar = (c) => {
+            return String.fromCharCode(c.charCodeAt(0) + 1).toUpperCase();
         }
 
         buildQuiz();
@@ -125,17 +129,44 @@
                 }
 
                 let correct_choice = currentQuestion.correct;
-                if (JSON.stringify(answerss) === JSON.stringify(correct_choice)) {
+                console.log(answerss)
+                console.log(correct_choice)
+                if (compare(answerss, correct_choice) === true) {
+                    console.log(numCorrect);
                     numCorrect++;
-
-                    answerContainers[questionNumber].style.color = 'lightgreen';
-                } else {
+                }else{
                     answerContainers[questionNumber].style.color = 'red';
+                    return;
+
                 }
 
             });
+
             scores = numCorrect;
             alert(`percentage: ${(numCorrect / myQuestions.length * 100).toFixed(2)}% \ncorrect: ${numCorrect}/${myQuestions.length}`);
+        }
+
+        function compare(a, b) {
+            if (a.length !== b.length) {
+                return false;
+            }
+
+            let seen = {};
+            a.forEach(function (v) {
+                let key = (typeof v) + v;
+                if (!seen[key]) {
+                    seen[key] = 0;
+                }
+                seen[key] += 1;
+            });
+
+            return b.every(function (v) {
+                let key = (typeof v) + v;
+                if (seen[key]) {
+                    seen[key] -= 1;
+                    return true;
+                }
+            });
         }
 
         confirmSubmitBtn.addEventListener('click', showResults);
@@ -221,6 +252,7 @@
             })
         }
 
+
         function checkSlide() {
             let currentSlide = 0;
 
@@ -267,50 +299,15 @@
             </div>
             `)
         })
-        $("#confirm-finish").on('click', function (e) {
-            e.preventDefault();
-            let answers = [];
-            let student_answers = {};
-            let i = 1;
-            $(".slide").each(function () {
-                $(this).children('.answers').children().children().children('input:checked').each(function () {
-                    answers.push($(this).val());
-                })
-                student_answers[i] = answers;
-                i += 1;
-                answers = [];
-            })
-            let json_data = JSON.stringify(student_answers);
-            $.ajax({
-                type: "POST",
-                url: '{% url 'finish_quiz' %}',
-                data: {
-                    score: scores,
-                    student_answer_data: json_data
-                },
-                success: function () {
-                    window.location.replace("{% url 'wait_after_finish' %}")
-                    window.history.pushState(null, "", window.location.href);
-                    window.onpopstate = function () {
-                        window.history.pushState(null, "", window.location.href);
-                    };
-                    alert("yes")
-                },
-                error: function () {
-                    alert("fail")
-                }
-            });
 
-        })
-
-        $(document).on('click', '#previous_quiz', function (e) {
+        function student_choice_save_db(e) {
             e.preventDefault();
             let answers = [];
             let student_answers = {};
             $(".slide").each(function () {
                 let ans_id = $(this).children(".answers").data("id")
                 $(this).children('.answers').children().children().children('input:checked').each(function () {
-                    answers.push($(this).val());
+                    answers.push($(this).siblings().attr('id'));
                 })
                 student_answers[ans_id] = answers;
                 answers = [];
@@ -329,10 +326,10 @@
                 error: function () {
                     alert("fail")
                 }
-             });
-        })
+            });
+        }
 
-        $(document).on('click', '#next_quiz', function (e) {
+        $("#confirm-finish").on('click', function (e) {
             e.preventDefault();
             let answers = [];
             let student_answers = {};
@@ -353,11 +350,25 @@
                     student_answer_data: json_data
                 },
                 success: function () {
+                    window.location.replace("{% url 'wait_after_finish' %}")
+                    window.history.pushState(null, "", window.location.href);
+                    window.onpopstate = function () {
+                        window.history.pushState(null, "", window.location.href);
+                    };
                 },
                 error: function () {
                     alert("fail")
                 }
-             });
+            });
+
+        })
+
+        $(document).on('click', '#previous_quiz', function (e) {
+            student_choice_save_db(e);
+        })
+
+        $(document).on('click', '#next_quiz', function (e) {
+            student_choice_save_db(e);
         })
 
 

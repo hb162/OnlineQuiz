@@ -3,7 +3,6 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from .forms import StudentSignIn
 from quiz.models import *
-from django.core import serializers
 import json
 import random
 from django.contrib import messages
@@ -63,25 +62,40 @@ def student_sign_in(request):
 def student_quiz_test(request):
     if request.session.has_key('room_name'):
         room_name = request.session['room_name']
-        std_name = request.session['student_name']
         room = Room.objects.get(name=room_name)
-        questions = ""
+        questions_detail = []
+        q = dict()
         if room.is_shuffle == "1":
             quiz = QuizCopy2.objects.get(id=room.quiz2_id)
             questions = quiz.questioncopy2_set.all()
         else:
             quiz = QuizCopy1.objects.get(id=room.quiz1_id)
             questions = quiz.questioncopy1_set.all()
-        questions_detail = []
-        q = dict()
-        for i in questions:
-            q['id'] = i.id
-            q['question_title'] = i.title
-            q['choices'] = json.loads(i.choices)
-            q['correct'] = json.loads(i.correct_choices)
-            questions_detail.append(q)
-            q = dict()
-        random.shuffle(questions_detail)
+        if room.shuffle_answers == "1":
+            for i in questions:
+                choices = json.loads(i.choices)
+                keys = list(choices.keys())
+                random.shuffle(keys)
+                choices_shuffle = dict()
+                for key in keys:
+                    choices_shuffle.update({key: choices[key]})
+                q['choices'] = choices_shuffle
+                q['id'] = i.id
+                q['question_title'] = i.title
+                q['correct'] = json.loads(i.correct_choices)
+                questions_detail.append(q)
+                q = dict()
+        else:
+            for i in questions:
+                choices = json.loads(i.choices)
+                q['choices'] = choices
+                q['id'] = i.id
+                q['question_title'] = i.title
+                q['correct'] = json.loads(i.correct_choices)
+                questions_detail.append(q)
+                q = dict()
+        if room.is_shuffle == "1":
+            random.shuffle(questions_detail)
         questions_detail = json.dumps(questions_detail)
         context = {
             'room': room,

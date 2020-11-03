@@ -1,3 +1,15 @@
+
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    font-family: Open Sans,Arial, sans-serif;
+    font-size: 12px;
+}
+
 #search_input {
     height: 46px;
     width: 80%;
@@ -274,7 +286,6 @@ footer {
 .delete_question {
     background-color: white;
     border: 0;
-
 }
 
 .delete_question:hover {
@@ -336,6 +347,37 @@ footer {
     line-height: 41px;
 }
 
+.circle_launch{
+    width: 130px;
+    position: relative;
+    top: 30px;
+    text-align: center;
+    margin: auto;
+}
+
+#quick-question{
+    position: relative;
+    top: 80px;
+    margin: auto;
+    text-align: center;
+}
+
+#quick-title{
+    width: 50%;
+    margin: auto;
+}
+
+#quick-title span{
+    font-weight: bolder;
+    color: #a3a3a3;
+}
+
+.quick-circle-launch{
+    width: 30%;
+    margin: auto;
+    display: inline-block;
+}
+
 .circle_launch_btn {
     font-size: 44px;
     height: 132px;
@@ -362,7 +404,22 @@ footer {
 
 .launch-button-label {
     font-size: 24px;
-    margin-left: 41px;
+    color: #a3a3a3;
+}
+
+#multiple-circle{
+    border-color: #e8e100;
+    color: #e8e100;
+}
+
+#true-false-circle{
+    border-color: #b10cf7;
+    color: #b10cf7;
+}
+
+#short-circle{
+    border-color: #ff8c00;
+    color: #ff8c00;
 }
 
 .start-quiz-search-icon {
@@ -450,6 +507,7 @@ footer {
 .toggle input[type="checkbox"]:checked + .slider:before {
     transform: translateX(26px);
 }
+
 
 /* Report Tab + Report Detail */
 

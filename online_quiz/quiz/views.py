@@ -33,6 +33,10 @@ class EmailThreading(threading.Thread):
         self.email_message.send()
 
 
+def landing_page(request):
+    return render(request, 'quiz/landing_page.html')
+
+
 def index(request):
     return render(request, 'quiz/index.html')
 
@@ -388,6 +392,7 @@ def launch_quizz(request):
         room_name = request.POST['room']
         required_name = request.POST['req_name']
         shuffle_question = request.POST['is_shuffle']
+        shuffle_answers = request.POST['shuffle_answers']
         quiz = Quiz.objects.get(title=quiz_title)
         questions = Questions.objects.filter(quiz_id=quiz.id)
         q_filter = Questions.objects.filter(quiz_id=quiz.id).values("title", "choices", "explain", "correct_choices")
@@ -425,6 +430,7 @@ def launch_quizz(request):
                     ResultsTest.objects.create(date=datetime.datetime.now(), quiz1_id=quiz_launch.id, room_id=r.id,
                                                teacher_id=request.user.id, status=1)
             elif shuffle_question == 'Yes':
+                r.is_shuffle = 1
                 quiz_copy2 = QuizCopy2.objects.filter(title=quiz.title, teacher_id=request.user.id).order_by('-date').first()
                 try:
                     question_copy_2 = QuestionCopy2.objects.filter(quiz2_id=quiz_copy2.id).values("title", "choices", "explain", "correct_choices")
@@ -438,7 +444,6 @@ def launch_quizz(request):
                 # Câu hỏi và quiz bị thay đổi hoặc chưa tồn tại
                 else:
                     quiz_launch = QuizCopy2.objects.create(title=quiz.title, teacher_id=request.user.id)
-                    r.is_shuffle = 1
                     r.quiz2_id = quiz_launch.id
                     for q in questions:
                         QuestionCopy2.objects.create(title=q.title,
@@ -448,6 +453,8 @@ def launch_quizz(request):
                                                      quiz2_id=quiz_launch.id)
                     ResultsTest.objects.create(date=datetime.datetime.now(), quiz2_id=quiz_launch.id, room_id=r.id,
                                                teacher_id=request.user.id, status=1)
+            if shuffle_answers == "Yes":
+                r.shuffle_answers = 1
             r.status = 1
             r.save()
             return HttpResponse("Success")
@@ -483,9 +490,7 @@ def quiz_result(request):
                 question_id = i.id
                 correct1 = json.loads(i.correct_choices)
                 q_correct[question_id] = correct1
-                print(q_correct)
 
-            print(q_correct)
             result_detail = ResultDetail.objects.filter(result_id=rs.id)
             context = {'result_test': rs, 'rs_detail': result_detail,
                        'std_choice': std_choice,
@@ -502,6 +507,7 @@ def end_quiz(request):
     r.quiz2_id = None
     r.required_name = 0
     r.is_shuffle = 0
+    r.shuffle_answers = 0
     r.status = 0
     rt = ResultsTest.objects.get(room_id=r.id, teacher_id=request.user.id, status=1)
     rt.status = 0
@@ -548,12 +554,10 @@ def delete_report(request):
 
 def report_detail(request, pk):
     result = ResultsTest.objects.get(id=pk)
-    result_detail = ResultDetail.objects.filter(result_id=pk)
     std_choice = ""
     result_detail = ""
     questions = ""
-    q_correct = []
-    list_correct = {}
+    q_correct = dict()
     q = ""
     if request.method == "GET":
         try:
@@ -562,18 +566,18 @@ def report_detail(request, pk):
                 q = QuizCopy1.objects.get(id=rs.quiz1.id, teacher_id=request.user.id)
                 questions = QuestionCopy1.objects.filter(quiz1_id=q.id)
             elif rs.quiz2:
-                q = QuizCopy2.objects.get(title=rs.quiz2.id, teacher_id=request.user.id)
-                questions = QuestionCopy1.objects.filter(quiz1_id=q.id)
+                q = QuizCopy2.objects.get(id=rs.quiz2.id, teacher_id=request.user.id)
+                questions = QuestionCopy2.objects.filter(quiz2_id=q.id)
             for i in questions:
-                i = json.loads(i.correct_choices)
-                q_correct.append(i)
-            for k, v in enumerate(q_correct, start=1):
-                list_correct[k] = v
+                question_id = i.id
+                correct1 = json.loads(i.correct_choices)
+                q_correct[question_id] = correct1
+
             result_detail = ResultDetail.objects.filter(result_id=rs.id)
 
-            context = {'rs': rs, 'rs_detail': result_detail,
+            context = {'result_test': rs, 'rs_detail': result_detail,
                        'std_choice': std_choice,
-                       'q': q, 'question': questions, 'list_correct': list_correct}
+                       'q': q, 'question': questions, 'list_correct': q_correct}
             return render(request, 'quiz/report_detail.html', context)
 
         except ResultsTest.DoesNotExist:

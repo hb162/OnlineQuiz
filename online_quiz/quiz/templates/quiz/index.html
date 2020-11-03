@@ -3,12 +3,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Trang web thi trắc nghiệm online">
     <title>{% block title %}
         Online Quiz
     {% endblock %}</title>
     <link rel="icon" type="image/x-icon" href="{% static 'image/favicon' %}">
     <link rel="stylesheet" href="{% static 'css/quizz.css' %}">
 
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
           integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
@@ -112,47 +115,46 @@
                     <div class="container">
                         {% block content %}
                             <div>
-                                <button type="button" id="launch-quiz-btn" class="circle_launch_btn">
-                                    <i class="fas fa-file-alt" id="icon-question"></i>
-                                </button>
+                                <div class="circle_launch">
+                                    <button type="button" id="launch-quiz-btn" class="circle_launch_btn">
+                                        <i class="fas fa-file-alt" id="icon-question"></i>
+                                    </button>
+                                    <p class="launch-button-label">QUIZ</p>
+                                </div>
                             </div>
-                            <span class="launch-button-label">Quiz</span>
+                            <div id="quick-question">
+                                <div id="quick-title">
+                                    <span><b>QUICK QUESTION (SOON)</b></span>
+                                </div>
+                                <br>
+                                <div id="quick-btn-area">
+                                    <div class="quick-circle-launch">
+                                        <button type="button" id="multiple-circle" class="circle_launch_btn" disabled>
+                                            <span>MC</span>
+                                        </button>
+                                        <p class="launch-button-label">Multiple Choice</p>
+                                    </div>
+                                    <div class="quick-circle-launch">
+                                        <button type="button" id="true-false-circle" class="circle_launch_btn" disabled>
+                                            <span>TF</span>
+                                        </button>
+                                        <p class="launch-button-label">True/False</p>
+                                    </div>
+                                    <div class="quick-circle-launch">
+                                        <button type="button" id="short-circle" class="circle_launch_btn" disabled>
+                                            <span>SA</span>
+                                        </button>
+                                        <p class="launch-button-label">Short Answer</p>
+                                    </div>
+                                </div>
+                            </div>
                         {% endblock %}
                     </div>
 
                 {% endif %}
 </div>
 {# modal sign in #}
-<div class="modal fade" id="singinmodal" tabindex="-1" role="dialog" aria-labelledby="singinmodal"
-     aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <a href="{% url 'student_sign_in' %}"
-                           class="btn btn-outline-primary btn-lg col-md-12 ml-auto" target="_blank">Student
-                            Login</a>
-                    </div>
-                    <div class="form-group">
-                        <a href="{% url 'teacher_sign_in' %}"
-                           class="btn btn-outline-warning btn-lg col-md-12 ml-auto" target="_blank">Teacher
-                            Login</a>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <p>Don't have an account</p>
-                <a href="{% url 'teacher_signup' %}" target="_blank">Sign Up now!</a>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 {% block footer %}
 

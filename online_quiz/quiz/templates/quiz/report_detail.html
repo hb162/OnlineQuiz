@@ -5,25 +5,25 @@
     {% if user.is_authenticated %}
         <div class="row">
             <div class="col-sm d-inline-flex p-2">
-                <div class="p-2 position-relative"><span style="font-size: 30px">{% firstof rs.quiz1.title rs.quiz2.title %} - {{ rs.date }}</span></div>
+                <div class="p-2 position-relative"><span style="font-size: 30px">{% firstof result_test.quiz1.title result_test.quiz2.title %} - {{ result_test.date }}</span></div>
             </div>
 
         </div>
         <hr>
         <table id="result_table" align="left" border="1px;">
-                <tr class="tr-result">
-                    <th class="name_column">
-                        <span id="span-column-name">Name</span>
-                        <span id="span-column-score" style="float:right">Score</span>
-                    </th>
-                    {% with ''|center:q.total_question as range %}
-                        {% for i in range %}
-                            <th class="answer_column">
-                                <a href="{{ j.id }}">{{ forloop.counter }}</a>
-                            </th>
-                        {% endfor %}
-                    {% endwith %}
-                </tr>
+            <tr class="tr-result">
+                <th class="name_column">
+                    <span id="span-column-name">Name</span>
+                    <span id="span-column-score" style="float:right">Score</span>
+                </th>
+                {% with ''|center:q.total_question as range %}
+                    {% for i in range %}
+                        <th class="answer_column">
+                            {{ forloop.counter }}
+                        </th>
+                    {% endfor %}
+                {% endwith %}
+            </tr>
             <tbody>
             {% for j in rs_detail %}
                 <tr class="tr-result">
@@ -34,10 +34,10 @@
                         </td>
                         {% for key, value in j.student_choice_data.items %}
                             {% for key1, value1 in list_correct.items %}
-                                {% if key1 == key|to_int and value == value1 %}
-                                    <td class="td-std-answer td-std-correct-ans">{{ value|join:" , " }}</td>
-                                {% elif key1 == key|to_int and value1 != value %}
-                                    <td class="td-std-answer td-std-wrong-ans">{{ value|join:" , " }}</td>
+                                {% if key1 == key|to_int and value|to_set == value1|to_set %}
+                                    <td class="td-std-answer" style="background-color:#90c15a !important; color: white">{{ value|join:" , " }}</td>
+                                {% elif key1 == key|to_int and value1|to_set != value|to_set %}
+                                    <td class="td-std-answer" style="background-color:#e31212 !important; color: white">{{ value|join:" , " }}</td>
                                 {% endif %}
                             {% endfor %}
 
@@ -49,8 +49,5 @@
             </tbody>
         </table>
     {% endif %}
-    <script>
-        $(document).ready(function () {
-        })
-    </script>
+
 {% endblock %}

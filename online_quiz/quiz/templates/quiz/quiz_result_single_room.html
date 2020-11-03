@@ -24,8 +24,8 @@
         <table id="result_table" align="left" border="1px;">
             <tr class="tr-result">
                 <th class="name_column">
-                        <span id="span-column-name">Name</span>
-                    </th>
+                    <span id="span-column-name">Name</span>
+                </th>
                 {% with ''|center:q.total_question as range %}
                     {% for rs in range %}
                         <th class="answer_column">
@@ -43,16 +43,15 @@
                         </td>
                         {% for key, value in j.student_choice_data.items %}
                             {% for key1, value1 in list_correct.items %}
-                                {% if key1 == key|to_int and value == value1 %}
+                                {% if key1 == key|to_int and value|to_set == value1|to_set %}
                                     <td class="td-std-answer" style="background-color:#90c15a !important; color: white">{{ value|join:" , " }}</td>
-                                {% elif key1 == key|to_int and value1 != value %}
+                                {% elif key1 == key|to_int and value1|to_set != value|to_set %}
                                     <td class="td-std-answer" style="background-color:#e31212 !important; color: white">{{ value|join:" , " }}</td>
                                 {% endif %}
                             {% endfor %}
 
                         {% endfor %}
                     {% else %}
-
                     {% endif %}
                 </tr>
             {% endfor %}
@@ -88,8 +87,6 @@
                 })
 
                 $("#btn-finish-quiz").on('click', function () {
-                    let a = {{ list_correct }}
-                    console.log(a)
                     $(this).html(
                         `<div class="spinner">
                             <div class="rect1"></div>
@@ -100,7 +97,7 @@
                     </div>
                     `)
                 })
-                
+
             })
         </script>
     {% endif %}
