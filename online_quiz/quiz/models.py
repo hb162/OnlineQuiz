@@ -40,7 +40,7 @@ class Teacher(AbstractBaseUser):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(max_length=100, unique=True, verbose_name='email address')
     date_joined = models.DateTimeField(auto_now_add=True)
-    active = models.BooleanField(default=False)
+    # active = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
 

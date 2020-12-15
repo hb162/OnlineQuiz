@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .utils import PasswordResetTokenGenerator
 from .models import *
 from django.contrib.auth.hashers import check_password, make_password
-from .forms import AuthenticationForm, UserCreationForm, RegistrationForm, RequestForgetPassword, ResetNewPassword, ChangePasswordForm
+from .forms import AuthenticationForm, RegistrationForm, RequestForgetPassword, ResetNewPassword, ChangePasswordForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text, DjangoUnicodeDecodeError
@@ -17,20 +17,19 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 import threading
 import json
-from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
 User = get_user_model()
 
 
-class EmailThreading(threading.Thread):
-    def __init__(self, email_message):
-        self.email_message = email_message
-        threading.Thread.__init__(self)
-
-    def run(self):
-        self.email_message.send()
+# class EmailThreading(threading.Thread):
+#     def __init__(self, email_message):
+#         self.email_message = email_message
+#         threading.Thread.__init__(self)
+#
+#     def run(self):
+#         self.email_message.send()
 
 
 def landing_page(request):
@@ -42,6 +41,7 @@ def index(request):
 
 
 def teacher_signup(request):
+    form = RegistrationForm()
     if request.method == "POST":
         form = RegistrationForm(data=request.POST)
         if form.is_valid():
@@ -49,50 +49,53 @@ def teacher_signup(request):
             email = form.cleaned_data.get('email')
             hashed = make_password(password)
             usr = form.save()
-            current_site = get_current_site(request)
-            email_subject = 'Activate your Account'
-            message = render_to_string('quiz/activate.html',
-                                       {
-                                           'user': usr,
-                                           'domain': current_site.domain,
-                                           'uid': urlsafe_base64_encode(force_bytes(usr.pk)),
-                                           'token': generate_token.make_token(usr)
-                                       })
-            email_message = EmailMessage(
-                email_subject,
-                message,
-                settings.EMAIL_HOST_USER,
-                [email]
-            )
-            EmailThreading(email_message).start()
-            login(request, usr, backend='django.contrib.auth.backends.ModelBackend')
-            messages.add_message(request, messages.INFO, 'Last step, checking your email to verify your account.')
-            return redirect("index")
-        else:
-            context = {
-                'registration_form': form
-            }
+            # usr.save()
+            return redirect("teacher_sign_in")
+        #     current_site = get_current_site(request)
+        #     email_subject = 'Activate your Account'
+        #     message = render_to_string('quiz/activate.html',
+        #                                {
+        #                                    'user': usr,
+        #                                    'domain': current_site.domain,
+        #                                    'uid': urlsafe_base64_encode(force_bytes(usr.pk)),
+        #                                    'token': generate_token.make_token(usr)
+        #                                })
+        #     email_message = EmailMessage(
+        #         email_subject,
+        #         message,
+        #         settings.EMAIL_HOST_USER,
+        #         [email]
+        #     )
+        #     EmailThreading(email_message).start()
+        #     login(request, usr, backend='django.contrib.auth.backends.ModelBackend')
+        #     messages.add_message(request, messages.INFO, 'Last step, checking your email to verify your account.')
+        #     return redirect("index")
+        # else:
+        #     context = {
+        #         'registration_form': form
+        #     }
     else:
         form = RegistrationForm()
         context = {
             'registration_form': form
         }
+    context = {'registration_form': form}
     return render(request, 'quiz/teacher_sign_up.html', context)
 
 
-def activate_account(request, uidb64, token):
-    if request.method == "GET":
-        try:
-            uid = force_text(urlsafe_base64_decode(uidb64))
-            user = Teacher.objects.get(pk=uid)
-        except Exception as identider:
-            user = None
-        if user is not None and generate_token.check_token(user, token):
-            user.active = True
-            user.save()
-            messages.add_message(request, messages.SUCCESS, 'Account activated succesfully.')
-            return redirect('index')
-        return render(request, 'quiz/activate_fail.html', status=401)
+# def activate_account(request, uidb64, token):
+#     if request.method == "GET":
+#         try:
+#             uid = force_text(urlsafe_base64_decode(uidb64))
+#             user = Teacher.objects.get(pk=uid)
+#         except Exception as identider:
+#             user = None
+#         if user is not None and generate_token.check_token(user, token):
+#             user.active = True
+#             user.save()
+#             messages.add_message(request, messages.SUCCESS, 'Account activated succesfully.')
+#             return redirect('index')
+#         return render(request, 'quiz/activate_fail.html', status=401)
 
 
 def teacher_sign_in(request):
@@ -103,9 +106,9 @@ def teacher_sign_in(request):
             password = form.cleaned_data['password']
             user = authenticate(email=email, password=password)
             if user:
-                if user.active:
-                    login(request, user)
-                    return redirect("index")
+                # if user.active:
+                login(request, user)
+                return redirect("index")
             else:
                 return HttpResponse("fail")
         else:
@@ -121,79 +124,80 @@ def teacher_sign_in(request):
 
 
 def teacher_log_out(request):
+    Teacher.objects.get(id=request.user.id).last_login=datetime.datetime.now()
     logout(request)
     return redirect("teacher_sign_in")
 
 
-def teacher_forgot_password(request):
-    if request.method == "GET":
-        form = RequestForgetPassword(data=request.GET)
-        return render(request, "quiz/request_reset_password_email.html", {'form': form})
-    else:
-        email = request.POST['email']
-        u = Teacher.objects.filter(email=email).first()
-        if u:
-            current_site = get_current_site(request)
-            email_subject = 'Reset your Account'
-            message = render_to_string('quiz/reset_password_email.html',
-                                       {
-                                           'user': u,
-                                           'domain': current_site.domain,
-                                           'uid': urlsafe_base64_encode(force_bytes(u.pk)),
-                                           'token': PasswordResetTokenGenerator().make_token(u)
-                                       })
-            email_message = EmailMessage(
-                email_subject,
-                message,
-                settings.EMAIL_HOST_USER,
-                [email]
-            )
-            EmailThreading(email_message).start()
-            messages.success(
-                request, 'We have sent you an email with instructions on how to reset your password')
-            return render(request, 'quiz/request_reset_password_email.html')
+# def teacher_forgot_password(request):
+#     if request.method == "GET":
+#         form = RequestForgetPassword(data=request.GET)
+#         return render(request, "quiz/request_reset_password_email.html", {'form': form})
+#     else:
+#         email = request.POST['email']
+#         u = Teacher.objects.filter(email=email).first()
+#         if u:
+#             current_site = get_current_site(request)
+#             email_subject = 'Reset your Account'
+#             message = render_to_string('quiz/reset_password_email.html',
+#                                        {
+#                                            'user': u,
+#                                            'domain': current_site.domain,
+#                                            'uid': urlsafe_base64_encode(force_bytes(u.pk)),
+#                                            'token': PasswordResetTokenGenerator().make_token(u)
+#                                        })
+#             email_message = EmailMessage(
+#                 email_subject,
+#                 message,
+#                 settings.EMAIL_HOST_USER,
+#                 [email]
+#             )
+#             EmailThreading(email_message).start()
+#             messages.success(
+#                 request, 'We have sent you an email with instructions on how to reset your password')
+#             return render(request, 'quiz/request_reset_password_email.html')
 
 
-class SetNewPassordView(View):
-    def get(self, request, uidb64, token):
-        context = {
-            'uidb64': uidb64,
-            'token': token
-        }
-        try:
-            id = force_text(urlsafe_base64_decode(uidb64))
-            user = Teacher.objects.get(id=id)
-            if not PasswordResetTokenGenerator().check_token(user, token):
-                messages.info(request, "Password reset link is invalid, please request again")
-                return render(request, 'quiz/request_reset_password_email.html')
-        except DjangoUnicodeDecodeError:
-            messages.info(request, "Invalid link")
-            return render(request, 'quiz/request_reset_password_email.html')
-        return render(request, 'quiz/set_new_password.html', context)
-
-    def post(self, request, uidb64, token):
-        reset_form = ResetNewPassword(data=request.POST)
-        if reset_form.is_valid():
-            try:
-                Teacher = get_user_model()
-                id = force_text(urlsafe_base64_decode(uidb64))
-                user = Teacher.objects.get(id=id)
-                paswd = reset_form.cleaned_data['password1']
-                hashed = make_password(paswd)
-                user.password = hashed
-                user.save()
-                return redirect('teacher_sign_in')
-            except DjangoUnicodeDecodeError:
-                messages.add_message(request, messages.ERROR, 'Something went wrong. Please try again.')
-                return render(request, 'quiz/set_new_password.html', {'reset_form': reset_form})
-        else:
-            context = {
-                'uidb64': uidb64,
-                'token': token,
-                'has_error': False,
-                'reset_form': reset_form
-            }
-        return render(request, 'quiz/set_new_password.html', context)
+# class SetNewPassordView(View):
+#     def get(self, request, uidb64, token):
+#         context = {
+#             'uidb64': uidb64,
+#             'token': token
+#         }
+#         try:
+#             id = force_text(urlsafe_base64_decode(uidb64))
+#             user = Teacher.objects.get(id=id)
+#             if not PasswordResetTokenGenerator().check_token(user, token):
+#                 messages.info(request, "Password reset link is invalid, please request again")
+#                 return render(request, 'quiz/request_reset_password_email.html')
+#         except DjangoUnicodeDecodeError:
+#             messages.info(request, "Invalid link")
+#             return render(request, 'quiz/request_reset_password_email.html')
+#         return render(request, 'quiz/set_new_password.html', context)
+#
+#     def post(self, request, uidb64, token):
+#         reset_form = ResetNewPassword(data=request.POST)
+#         if reset_form.is_valid():
+#             try:
+#                 Teacher = get_user_model()
+#                 id = force_text(urlsafe_base64_decode(uidb64))
+#                 user = Teacher.objects.get(id=id)
+#                 paswd = reset_form.cleaned_data['password1']
+#                 hashed = make_password(paswd)
+#                 user.password = hashed
+#                 user.save()
+#                 return redirect('teacher_sign_in')
+#             except DjangoUnicodeDecodeError:
+#                 messages.add_message(request, messages.ERROR, 'Something went wrong. Please try again.')
+#                 return render(request, 'quiz/set_new_password.html', {'reset_form': reset_form})
+#         else:
+#             context = {
+#                 'uidb64': uidb64,
+#                 'token': token,
+#                 'has_error': False,
+#                 'reset_form': reset_form
+#             }
+#         return render(request, 'quiz/set_new_password.html', context)
 
 
 def change_password(request):
